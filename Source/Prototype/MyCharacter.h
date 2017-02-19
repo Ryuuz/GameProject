@@ -25,7 +25,12 @@ public:
 
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
+	void Raycast();
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* PlayerMesh;
 	
 private:
 	FVector CurrentVelocity;
+	UCameraComponent* PlayerCamera;
 };
