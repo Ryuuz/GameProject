@@ -20,14 +20,13 @@ ATree::ATree()
 		TreeMesh->SetStaticMesh(TreeAsset.Object);
 		TreeMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 4.f));
 	}
-
 }
 
 // Called when the game starts or when spawned
 void ATree::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Tags.Add(FName("Tree"));
 }
 
 // Called every frame
@@ -35,6 +34,7 @@ void ATree::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Make the actor visible if hidden
 	if (bHidden)
 	{
 		SetActorHiddenInGame(false);

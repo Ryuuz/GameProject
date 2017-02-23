@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//A tree
 
 #pragma once
 
@@ -22,6 +22,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UStaticMeshComponent* TreeMesh;
-	
+	UStaticMeshComponent* TreeMesh;	
 };

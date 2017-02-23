@@ -31,6 +31,7 @@ void AMyCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	//Move character
 	if (!CurrentVelocity.IsZero())
 	{
 		FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
@@ -62,6 +63,8 @@ void AMyCharacter::Move_YAxis(float AxisValue)
 }
 
 
+//Casts a ray and sees if it hits a tree
+//Created by following the tutorial made by Reuben Ward at https://www.youtube.com/watch?v=YrlagR_Hb2Q&list=PL3gCaTLUSAUvi_XbOXOZic20quqAWuY-q&index=5
 void AMyCharacter::Raycast()
 {
 	FHitResult* ObjectHit = new FHitResult();
@@ -71,10 +74,9 @@ void AMyCharacter::Raycast()
 
 	if (GetWorld()->LineTraceSingleByChannel(*ObjectHit, StartTrace, EndTrace, ECC_Visibility, *CQP))
 	{
-		if (ObjectHit->GetActor()->GetName() != GetName())
+		if (ObjectHit->GetActor()->ActorHasTag("Tree"))
 		{
 			ObjectHit->GetActor()->SetActorHiddenInGame(true);
-			//UE_LOG(LogTemp, Warning, TEXT("Got Actor: %s"), *ObjectHit->GetActor()->GetName());
 		}
 	}
 }
