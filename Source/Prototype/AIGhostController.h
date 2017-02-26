@@ -22,8 +22,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FName PlayerKey;
 
+	UPROPERTY(EditDefaultsOnly)
+	FName LanternKey;
+
 	AAIGhostController();
-	void SetPlayerCaught(APawn* pawn);
+	void SetPlayerCaught(APawn* pawn, bool Light);
 	virtual void Possess(APawn* pawn) override;
 
 	FORCEINLINE UBlackboardComponent* GetBlackboardComp() const { return BlackboardComp; }

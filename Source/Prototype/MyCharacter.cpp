@@ -18,12 +18,15 @@ AMyCharacter::AMyCharacter()
 
 	PlayerMesh->SetupAttachment(RootComponent);
 	PlayerCamera->SetupAttachment(RootComponent);
+
+	Lantern = true;
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	Tags.Add(FName("Player"));
 }
 
 // Called every frame

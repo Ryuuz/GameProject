@@ -16,17 +16,25 @@ AAIGhostController::AAIGhostController()
 
 	LocationToGoKey = "LocationToGo";
 	PlayerKey = "Target";
+	LanternKey = "LanternOn";
 
 	CurrentPatrolPoint = 0;
 }
 
 
-void AAIGhostController::SetPlayerCaught(APawn* pawn)
+void AAIGhostController::SetPlayerCaught(APawn* pawn, bool Light)
 {
 	if (BlackboardComp)
 	{
-		BlackboardComp->SetValueAsObject(PlayerKey, pawn);
-		UE_LOG(LogTemp, Warning, TEXT("Boo!"));
+		if (((pawn->GetActorLocation() - (Cast<AAIGhost>(GetCharacter())->GetStartPos())).Size()) < 1500)
+		{
+			BlackboardComp->SetValueAsBool(LanternKey, Light);
+			BlackboardComp->SetValueAsObject(PlayerKey, pawn);	
+		}
+		else
+		{
+			BlackboardComp->ClearValue(PlayerKey);
+		}
 	}
 }
 

@@ -27,10 +27,13 @@ public:
 	void Move_YAxis(float AxisValue);
 	void Raycast();
 
+	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
+
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PlayerMesh;
 	
 private:
 	FVector CurrentVelocity;
 	UCameraComponent* PlayerCamera;
+	bool Lantern;
 };

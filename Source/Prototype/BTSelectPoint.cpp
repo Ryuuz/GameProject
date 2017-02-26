@@ -4,6 +4,7 @@
 #include "BTSelectPoint.h"
 #include "AIGhostTargetPoint.h"
 #include "AIGhostController.h"
+#include "AIGhost.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 EBTNodeResult::Type UBTSelectPoint::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
@@ -19,7 +20,7 @@ EBTNodeResult::Type UBTSelectPoint::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 
 		if (AICon->CurrentPatrolPoint != AvailablePoints.Num() - 1)
 		{
-			NextPoint = Cast<AAIGhostTargetPoint>(AvailablePoints[AICon->CurrentPatrolPoint++]);
+			NextPoint = Cast<AAIGhostTargetPoint>(AvailablePoints[++AICon->CurrentPatrolPoint]);
 		}
 		else
 		{
@@ -27,8 +28,11 @@ EBTNodeResult::Type UBTSelectPoint::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 			AICon->CurrentPatrolPoint = 0;
 		}
 
-		BlackboardComp->SetValueAsObject("LocationToGo", NextPoint);
-		return EBTNodeResult::Succeeded;
+		if (AICon->GetCharacter()->GetDistanceTo(NextPoint) <= 1000.f)
+		{
+			BlackboardComp->SetValueAsObject("LocationToGo", NextPoint);
+			return EBTNodeResult::Succeeded;
+		}
 	}
 
 	return EBTNodeResult::Failed;

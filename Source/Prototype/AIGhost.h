@@ -28,13 +28,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	FORCEINLINE FVector GetStartPos() const { return StartPosition; }
+
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* BehaviorTree;
 	
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* AIMesh;
+
 private:
 	UFUNCTION()
 	void OnPlayerCaught(APawn* pawn);
+
+	float RunningTime;
+	float CurrentZ;
+	FVector StartPosition;
 };

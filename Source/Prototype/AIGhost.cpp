@@ -4,6 +4,7 @@
 #include "AIGhostController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Perception/PawnSensingComponent.h"
+#include "MyCharacter.h"
 #include "AIGhost.h"
 
 
@@ -13,8 +14,20 @@ AAIGhost::AAIGhost()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AIMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AIMesh"));
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
+	
 	PawnSensingComp->SetPeripheralVisionAngle(90.f);
+	AIMesh->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	if (AIAsset.Succeeded())
+	{
+		AIMesh->SetStaticMesh(AIAsset.Object);
+		AIMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
+	}
+
+	CurrentZ = 0;
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +39,8 @@ void AAIGhost::BeginPlay()
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &AAIGhost::OnPlayerCaught);
 	}
+
+	StartPosition = GetActorLocation();
 }
 
 // Called every frame
@@ -33,6 +48,10 @@ void AAIGhost::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
+	CurrentZ += DeltaHeight * 20.0f;
+	RunningTime += DeltaTime;
+	AIMesh->SetRelativeLocation(FVector(0.f, 0.f, CurrentZ));
 }
 
 // Called to bind functionality to input
@@ -48,7 +67,10 @@ void AAIGhost::OnPlayerCaught(APawn* pawn)
 
 	if (AIController)
 	{
-		AIController->SetPlayerCaught(pawn);
+		if (pawn->ActorHasTag("Player")/* && ((pawn->GetActorLocation() - StartPosition).Size()) < 500*/)
+		{
+			AIController->SetPlayerCaught(pawn, Cast<AMyCharacter>(pawn)->GetLanternStatus());
+		}		
 	}
 }
 
