@@ -42,6 +42,34 @@ void AMyCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	FHitResult Hit;
+	bool HitResult = false;
+
+	HitResult = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_WorldStatic), true, Hit);
+
+	if (HitResult)
+	{
+		FVector CursorFV = Hit.ImpactNormal;
+		FRotator CursorR = CursorFV.Rotation();
+
+
+		FVector CursorLocation = Hit.Location;
+		UE_LOG(LogTemp, Warning, TEXT("Cursor location %s!"), *CursorLocation.ToString());
+		FVector TempLocation = FVector(CursorLocation.X, CursorLocation.Y, 30.f);
+		//        if (CursorMesh)
+		//            CursorMesh->SetWorldLocation(TempLocation);
+		//        else
+		//            UE_LOG(LogTemp, Warning, TEXT("Cursor Mesh not found"));
+
+		FVector NewDirection = TempLocation - GetActorLocation();
+		NewDirection.Z = 0.f;
+		NewDirection.Normalize();
+		PlayerMesh->SetWorldRotation(NewDirection.Rotation());
+	}
+
+
+
+
 	//Move character
 	if (!CurrentVelocity.IsZero())
 	{
