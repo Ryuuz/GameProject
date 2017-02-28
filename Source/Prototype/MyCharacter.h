@@ -25,15 +25,25 @@ public:
 
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
+	void JumpUp();
 	void Raycast();
 
 	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
 
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PlayerMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* CollisionComponent;
 	
 private:
 	FVector CurrentVelocity;
 	UCameraComponent* PlayerCamera;
 	bool Lantern;
+	bool Jumping;
+	float JumpTime;
+	float Jumped;
 };

@@ -41,6 +41,7 @@ void AAIGhost::BeginPlay()
 	}
 
 	StartPosition = GetActorLocation();
+	Tags.Add(FName("Enemy"));
 }
 
 // Called every frame
@@ -67,7 +68,7 @@ void AAIGhost::OnPlayerCaught(APawn* pawn)
 
 	if (AIController)
 	{
-		if (pawn->ActorHasTag("Player")/* && ((pawn->GetActorLocation() - StartPosition).Size()) < 500*/)
+		if (pawn->ActorHasTag("Player"))
 		{
 			AIController->SetPlayerCaught(pawn, Cast<AMyCharacter>(pawn)->GetLanternStatus());
 		}		

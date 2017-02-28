@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Prototype.h"
+#include "MyPlayerController.h"
 #include "MyCharacter.h"
 
 
@@ -11,15 +12,22 @@ AMyCharacter::AMyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 
+	CollisionComponent->InitSphereRadius(40.f);
 	PlayerCamera->SetRelativeLocation(FVector(-320.f, 350.f, 380.f));
 	PlayerCamera->SetWorldRotation(FRotator(-40.1f, -45.1f, 0.f));
 
 	PlayerMesh->SetupAttachment(RootComponent);
+	CollisionComponent->SetupAttachment(RootComponent);
 	PlayerCamera->SetupAttachment(RootComponent);
 
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);	
+
 	Lantern = true;
+	Jumping = false;
+	JumpTime = 0.8f;
 }
 
 // Called when the game starts or when spawned
@@ -41,6 +49,40 @@ void AMyCharacter::Tick( float DeltaTime )
 		SetActorLocation(NewLocation);
 	}
 
+	if (Jumping)
+	{
+		CurrentVelocity.Z = FMath::Clamp(1.f, 0.f, 1.f) * 200.f;
+		
+		if (CurrentVelocity.Z > 200.f)
+		{
+			CurrentVelocity.Z = 200.f;
+		}
+
+		float NewZ = GetActorLocation().Z + (CurrentVelocity.Z * DeltaTime);
+		FVector NewLocation = GetActorLocation();
+		NewLocation.Z = NewZ;
+		SetActorLocation(NewLocation);
+
+		if ((GetWorld()->GetTimeSeconds() - Jumped) > JumpTime)
+		{
+			Jumping = false;
+		}
+	}
+	else if(!Jumping && CurrentVelocity.Z != 0)
+	{
+		CurrentVelocity.Z = FMath::Clamp(-1.f, -1.f, 0.f) * 300.f;
+		
+		if (CurrentVelocity.Z < -300.f)
+		{
+			CurrentVelocity.Z = -300.f;
+		}
+
+		float NewZ = GetActorLocation().Z + (CurrentVelocity.Z * DeltaTime);
+		FVector NewLocation = GetActorLocation();
+		NewLocation.Z = NewZ;
+		SetActorLocation(NewLocation);
+	}
+
 	Raycast();
 }
 
@@ -48,21 +90,28 @@ void AMyCharacter::Tick( float DeltaTime )
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	InputComponent->BindAxis("MoveX", this, &AMyCharacter::Move_XAxis);
-	InputComponent->BindAxis("MoveY", this, &AMyCharacter::Move_YAxis);
 }
 
 
 void AMyCharacter::Move_XAxis(float AxisValue)
 {
-	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.f, 1.f) * 100.f;
+	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.f, 1.f) * 200.f;
 }
 
 
 void AMyCharacter::Move_YAxis(float AxisValue)
 {
-	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.f, 1.f) * 100.f;
+	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.f, 1.f) * 200.f;
+}
+
+
+void AMyCharacter::JumpUp()
+{
+	if (!Jumping)
+	{
+		Jumped = GetWorld()->GetTimeSeconds();
+		Jumping = true;
+	}
 }
 
 
@@ -81,5 +130,14 @@ void AMyCharacter::Raycast()
 		{
 			ObjectHit->GetActor()->SetActorHiddenInGame(true);
 		}
+	}
+}
+
+void AMyCharacter::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	if (OtherActor->ActorHasTag("Enemy"))
+	{
+		OtherActor->Destroy();
+		Cast<AMyPlayerController>(GetController())->TakeDamage(10);
 	}
 }

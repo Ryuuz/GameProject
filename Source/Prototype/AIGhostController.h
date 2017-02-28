@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FName LanternKey;
 
+	UPROPERTY(EditDefaultsOnly)
+	FName ReturnKey;
+
 	AAIGhostController();
 	void SetPlayerCaught(APawn* pawn, bool Light);
 	virtual void Possess(APawn* pawn) override;

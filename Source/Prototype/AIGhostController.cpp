@@ -26,15 +26,9 @@ void AAIGhostController::SetPlayerCaught(APawn* pawn, bool Light)
 {
 	if (BlackboardComp)
 	{
-		if (((pawn->GetActorLocation() - (Cast<AAIGhost>(GetCharacter())->GetStartPos())).Size()) < 1500)
-		{
-			BlackboardComp->SetValueAsBool(LanternKey, Light);
-			BlackboardComp->SetValueAsObject(PlayerKey, pawn);	
-		}
-		else
-		{
-			BlackboardComp->ClearValue(PlayerKey);
-		}
+		//BlackboardComp->ClearValue(ReturnKey);
+		BlackboardComp->SetValueAsBool(LanternKey, Light);
+		BlackboardComp->SetValueAsObject(PlayerKey, pawn);
 	}
 }
 
