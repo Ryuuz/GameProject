@@ -20,6 +20,12 @@ ATree::ATree()
 		TreeMesh->SetStaticMesh(TreeAsset.Object);
 		TreeMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 4.f));
 	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatTrunk(TEXT("Material'/Game/mats/Trunk.Trunk'"));
+	if (MatTrunk.Succeeded())
+	{
+		TreeMesh->SetMaterial(0, MatTrunk.Object);
+	}
 }
 
 // Called when the game starts or when spawned

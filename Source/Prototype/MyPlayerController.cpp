@@ -50,6 +50,7 @@ void AMyPlayerController::JumpUp()
 	}
 }
 
+/*
 void AMyPlayerController::TakeDamage(int32 Damage)
 {
 	Health -= Damage;
@@ -59,4 +60,4 @@ void AMyPlayerController::TakeDamage(int32 Damage)
 		Health = 0;
 	}
 }
-
+*/

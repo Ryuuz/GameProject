@@ -54,7 +54,7 @@ void AMyCharacter::Tick( float DeltaTime )
 
 
 		FVector CursorLocation = Hit.Location;
-		UE_LOG(LogTemp, Warning, TEXT("Cursor location %s!"), *CursorLocation.ToString());
+//		UE_LOG(LogTemp, Warning, TEXT("Cursor location %s!"), *CursorLocation.ToString());
 		FVector TempLocation = FVector(CursorLocation.X, CursorLocation.Y, 30.f);
 		//        if (CursorMesh)
 		//            CursorMesh->SetWorldLocation(TempLocation);
@@ -166,6 +166,6 @@ void AMyCharacter::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor *
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
 		OtherActor->Destroy();
-		Cast<AMyPlayerController>(GetController())->TakeDamage(10);
+		//Cast<AMyPlayerController>(GetController())->TakeDamage(10);
 	}
 }
