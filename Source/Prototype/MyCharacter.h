@@ -26,6 +26,7 @@ public:
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void JumpUp();
+	void StopJump();
 	void Raycast();
 
 	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
@@ -42,8 +43,5 @@ public:
 private:
 	FVector CurrentVelocity;
 	UCameraComponent* PlayerCamera;
-	bool Lantern;
-	bool Jumping;
-	float JumpTime;
-	float Jumped;
+	bool Lantern = true;
 };

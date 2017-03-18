@@ -4,11 +4,14 @@
 #include "MyCharacter.h"
 #include "MyPlayerController.h"
 
+
 // Made using the post at https://www.reddit.com/r/unrealengine/comments/34c73q/help_with_creating_a_custom_playercontroller_or/ by user emp-
 AMyPlayerController::AMyPlayerController(const class FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	Health = 100;
+	Lantern = false;
 }
+
 
 void AMyPlayerController::SetupInputComponent()
 {
@@ -17,7 +20,9 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveX", this, &AMyPlayerController::Move_XAxis);
 	InputComponent->BindAxis("MoveY", this, &AMyPlayerController::Move_YAxis);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AMyPlayerController::JumpUp);
+	InputComponent->BindAction("Jump", IE_Released, this, &AMyPlayerController::StopJump);
 }
+
 
 void AMyPlayerController::Move_XAxis(float AxisValue)
 {
@@ -40,6 +45,7 @@ void AMyPlayerController::Move_YAxis(float AxisValue)
 	}
 }
 
+
 void AMyPlayerController::JumpUp()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -47,6 +53,17 @@ void AMyPlayerController::JumpUp()
 	if (Player)
 	{
 		Player->JumpUp();
+	}
+}
+
+
+void AMyPlayerController::StopJump()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopJump();
 	}
 }
 

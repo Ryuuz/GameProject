@@ -24,11 +24,8 @@ AMyCharacter::AMyCharacter()
 	PlayerCamera->SetupAttachment(RootComponent);
 
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);	
-
-	Lantern = true;
-	Jumping = false;
-	JumpTime = 0.8f;
 }
+
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
@@ -37,12 +34,13 @@ void AMyCharacter::BeginPlay()
 	Tags.Add(FName("Player"));
 }
 
+
 // Called every frame
 void AMyCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	FHitResult Hit;
+	/*FHitResult Hit;
 	bool HitResult = false;
 
 	HitResult = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_WorldStatic), true, Hit);
@@ -65,54 +63,11 @@ void AMyCharacter::Tick( float DeltaTime )
 		NewDirection.Z = 0.f;
 		NewDirection.Normalize();
 		PlayerMesh->SetWorldRotation(NewDirection.Rotation());
-	}
-
-
-
-
-	//Move character
-	if (!CurrentVelocity.IsZero())
-	{
-		FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
-		SetActorLocation(NewLocation);
-	}
-
-	if (Jumping)
-	{
-		CurrentVelocity.Z = FMath::Clamp(1.f, 0.f, 1.f) * 200.f;
-		
-		if (CurrentVelocity.Z > 200.f)
-		{
-			CurrentVelocity.Z = 200.f;
-		}
-
-		float NewZ = GetActorLocation().Z + (CurrentVelocity.Z * DeltaTime);
-		FVector NewLocation = GetActorLocation();
-		NewLocation.Z = NewZ;
-		SetActorLocation(NewLocation);
-
-		if ((GetWorld()->GetTimeSeconds() - Jumped) > JumpTime)
-		{
-			Jumping = false;
-		}
-	}
-	else if(!Jumping && CurrentVelocity.Z != 0)
-	{
-		CurrentVelocity.Z = FMath::Clamp(-1.f, -1.f, 0.f) * 300.f;
-		
-		if (CurrentVelocity.Z < -300.f)
-		{
-			CurrentVelocity.Z = -300.f;
-		}
-
-		float NewZ = GetActorLocation().Z + (CurrentVelocity.Z * DeltaTime);
-		FVector NewLocation = GetActorLocation();
-		NewLocation.Z = NewZ;
-		SetActorLocation(NewLocation);
-	}
+	}*/
 
 	Raycast();
 }
+
 
 // Called to bind functionality to input
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -121,25 +76,37 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 
 
+//https://wiki.unrealengine.com/First_Person_Shooter_C%2B%2B_Tutorial for movement
 void AMyCharacter::Move_XAxis(float AxisValue)
 {
-	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.f, 1.f) * 200.f;
+	if (Controller != NULL && AxisValue != 0.f)
+	{
+		FRotator Rotation = Controller->GetControlRotation();
+		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, AxisValue);
+	}
 }
 
 
 void AMyCharacter::Move_YAxis(float AxisValue)
 {
-	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.f, 1.f) * 200.f;
+	if (Controller != NULL && AxisValue != 0.f)
+	{
+		FRotator Rotation = Controller->GetControlRotation();
+		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
+		AddMovementInput(Direction, AxisValue);
+	}
 }
 
 
 void AMyCharacter::JumpUp()
 {
-	if (!Jumping)
-	{
-		Jumped = GetWorld()->GetTimeSeconds();
-		Jumping = true;
-	}
+	ACharacter::Jump();
+}
+
+void AMyCharacter::StopJump()
+{
+	ACharacter::StopJumping();
 }
 
 
@@ -160,6 +127,7 @@ void AMyCharacter::Raycast()
 		}
 	}
 }
+
 
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {

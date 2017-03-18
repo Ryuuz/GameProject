@@ -11,6 +11,7 @@ AAIShroomController::AAIShroomController()
 }
 
 
+//If AI has seen the player, it starts chasing said player
 void AAIShroomController::SetPlayerAsSeen(APawn * Player)
 {
 	MoveToActor(Player, 0.5f);
@@ -20,15 +21,10 @@ void AAIShroomController::SetPlayerAsSeen(APawn * Player)
 void AAIShroomController::Possess(APawn * AIChar)
 {
 	Super::Possess(AIChar);
-
-	AAIMushroom* AShroom = Cast<AAIMushroom>(AIChar);
-
-	if (AShroom)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("I'm possessed"));
-	}
 }
 
+
+//Moves the AI back to its spawn location
 void AAIShroomController::ReturnToStart(FVector StartPosition)
 {
 	MoveToLocation(StartPosition);

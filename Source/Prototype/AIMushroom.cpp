@@ -26,6 +26,9 @@ AAIMushroom::AAIMushroom()
 		ShroomMesh->SetStaticMesh(AIAsset.Object);
 		ShroomMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
 	}
+
+	ChasingPlayer = false;
+	Returning = false;
 }
 
 
@@ -49,7 +52,14 @@ void AAIMushroom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Checks if it has gotten too far from its spawn point
 	DistanceFromStart();
+
+	//Walk around if there's no player to chase
+	if (!ChasingPlayer)
+	{
+		MoveForward();
+	}
 }
 
 
@@ -57,31 +67,61 @@ void AAIMushroom::Tick(float DeltaTime)
 void AAIMushroom::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
 }
 
 
+//Checks distance from 'StartPosition'
 void AAIMushroom::DistanceFromStart()
 {
+	//If distance is greater than 1000 units, return to 'StartPosition'
 	if ((GetActorLocation() - StartPosition).Size() > 1000.f)
 	{
 		AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
 
 		if (AIController)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Too far from start"));
+			Returning = true;
 			AIController->ReturnToStart(StartPosition);
 		}
 	}
+	//If returning from having chased a player and is within 'AreaRadius', prepare to start walking around
+	else if (Returning && (GetActorLocation() - StartPosition).Size() < AreaRadius)
+	{
+		ChasingPlayer = false;
+		Returning = false;
+	}
+}
+
+//Moves the AI forwards
+void AAIMushroom::MoveForward()
+{
+	FVector Direction;
+	FVector NextPos = GetActorLocation() + 1.f*GetVelocity();
+
+	//If at the edge of the 'AreaRadius', turn around a random degree
+	if ((FMath::Square(StartPosition.X - NextPos.X) + FMath::Square(StartPosition.Y - NextPos.Y)) >= FMath::Square(AreaRadius - GetCapsuleComponent()->GetUnscaledCapsuleRadius()))
+	{
+		float NewAngle = FMath::RandRange(90.f, 180.f);
+		AddActorLocalRotation(FRotator(0.f, NewAngle, 0.f));
+	}
+
+	const FRotator Rotation = GetActorRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	
+	AddMovementInput(Direction, 1);
 }
 
 
+//When player enters the AI's sight
 void AAIMushroom::OnPlayerSeen(APawn* pawn)
 {
 	AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
 
 	if (pawn->ActorHasTag("Player") && AIController)
 	{
+		ChasingPlayer = true;
 		AIController->SetPlayerAsSeen(pawn);
 	}
 }
