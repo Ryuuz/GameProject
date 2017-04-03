@@ -27,6 +27,9 @@ public:
 	void Move_YAxis(float AxisValue);
 	void JumpUp();
 	void StopJump();
+	void Interacting();
+	void StopInteracting();
+	void ThrowItem();
 	void Raycast();
 
 	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
@@ -37,11 +40,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PlayerMesh;
 
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* CollisionComponent;
+	UPROPERTY(EditAnywhere)
+	UCapsuleComponent* CollisionComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ARockProjectile> ThrowClass;
 	
 private:
 	FVector CurrentVelocity;
 	UCameraComponent* PlayerCamera;
+	class APickUp* HeldObject;
 	bool Lantern = true;
+	bool AttemptInteract;
+	bool HoldingItem;
+	bool Consumeable;
 };

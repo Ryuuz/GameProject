@@ -21,6 +21,9 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveY", this, &AMyPlayerController::Move_YAxis);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AMyPlayerController::JumpUp);
 	InputComponent->BindAction("Jump", IE_Released, this, &AMyPlayerController::StopJump);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AMyPlayerController::Interacting);
+	InputComponent->BindAction("Interact", IE_Released, this, &AMyPlayerController::StopInteracting);
+	InputComponent->BindAction("Throw", IE_Pressed, this, &AMyPlayerController::ThrowObject);
 }
 
 
@@ -66,6 +69,38 @@ void AMyPlayerController::StopJump()
 		Player->StopJump();
 	}
 }
+
+
+void AMyPlayerController::Interacting()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->Interacting();
+	}
+}
+
+
+void AMyPlayerController::StopInteracting()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopInteracting();
+	}
+}
+void AMyPlayerController::ThrowObject()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->ThrowItem();
+	}
+}
+
 
 /*
 void AMyPlayerController::TakeDamage(int32 Damage)

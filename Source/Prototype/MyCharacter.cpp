@@ -2,6 +2,8 @@
 
 #include "Prototype.h"
 #include "MyPlayerController.h"
+#include "PickUp.h"
+#include "RockProjectile.h"
 #include "MyCharacter.h"
 
 
@@ -12,18 +14,25 @@ AMyCharacter::AMyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
+	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionComp"));
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 
-	CollisionComponent->InitSphereRadius(40.f);
+	CollisionComponent->InitCapsuleSize(45.f, 70.f);
+	GetCapsuleComponent()->InitCapsuleSize(30.f, 60.f);
+
+	CollisionComponent->SetRelativeLocation(FVector(0.f, 0.f, 5.f));
 	PlayerCamera->SetRelativeLocation(FVector(-320.f, 350.f, 380.f));
-	PlayerCamera->SetWorldRotation(FRotator(-40.1f, -45.1f, 0.f));
+	PlayerCamera->SetWorldRotation(FRotator(-40.f, -45.1f, 0.f));
 
 	PlayerMesh->SetupAttachment(RootComponent);
 	CollisionComponent->SetupAttachment(RootComponent);
 	PlayerCamera->SetupAttachment(RootComponent);
 
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);	
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+
+	AttemptInteract = false;
+	HoldingItem = false;
+	HeldObject = nullptr;
 }
 
 
@@ -39,31 +48,6 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
-	/*FHitResult Hit;
-	bool HitResult = false;
-
-	HitResult = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_WorldStatic), true, Hit);
-
-	if (HitResult)
-	{
-		FVector CursorFV = Hit.ImpactNormal;
-		FRotator CursorR = CursorFV.Rotation();
-
-
-		FVector CursorLocation = Hit.Location;
-//		UE_LOG(LogTemp, Warning, TEXT("Cursor location %s!"), *CursorLocation.ToString());
-		FVector TempLocation = FVector(CursorLocation.X, CursorLocation.Y, 30.f);
-		//        if (CursorMesh)
-		//            CursorMesh->SetWorldLocation(TempLocation);
-		//        else
-		//            UE_LOG(LogTemp, Warning, TEXT("Cursor Mesh not found"));
-
-		FVector NewDirection = TempLocation - GetActorLocation();
-		NewDirection.Z = 0.f;
-		NewDirection.Normalize();
-		PlayerMesh->SetWorldRotation(NewDirection.Rotation());
-	}*/
 
 	Raycast();
 }
@@ -107,6 +91,70 @@ void AMyCharacter::JumpUp()
 void AMyCharacter::StopJump()
 {
 	ACharacter::StopJumping();
+}
+
+
+void AMyCharacter::Interacting()
+{
+	//Get all actors within player's collision component
+	TArray<AActor*> Overlapping;
+	GetOverlappingActors(Overlapping);
+
+	//Check if there's a PickUp object, and pick it up if there is
+	for (auto Obj : Overlapping)
+	{
+		if (AttemptInteract == false)
+		{
+			if ((Obj->ActorHasTag("PickUp") && HoldingItem == false))
+			{
+				Obj->SetActorEnableCollision(false);
+				Obj->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("RightHand")));
+				AttemptInteract = true;
+				HoldingItem = true;
+				HeldObject = Cast<APickUp>(Obj);
+			}
+			else if (Obj->ActorHasTag("Consumable"))
+			{
+				Obj->Destroy();
+			}
+		}
+	}
+}
+
+
+void AMyCharacter::StopInteracting()
+{
+	AttemptInteract = false;
+}
+
+void AMyCharacter::ThrowItem()
+{
+	if (HoldingItem)
+	{
+		FVector ItemPos = HeldObject->GetActorLocation();
+		FRotator ItemRot = HeldObject->GetActorRotation();
+		ItemRot.Pitch += 20.f;
+		HeldObject->Destroy();
+
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+
+			ARockProjectile* Projectile = World->SpawnActor<ARockProjectile>(ARockProjectile::StaticClass(), ItemPos, ItemRot, SpawnParams);
+
+			if (Projectile)
+			{
+				FVector LaunchDirection = ItemRot.Vector();
+				Projectile->ThrowInDirection(LaunchDirection);
+			}
+		}
+
+		HeldObject = nullptr;
+		HoldingItem = false;
+	}
 }
 
 

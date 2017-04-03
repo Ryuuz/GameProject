@@ -21,6 +21,9 @@ public:
 	void Move_YAxis(float AxisValue);
 	void JumpUp();
 	void StopJump();
+	void Interacting();
+	void StopInteracting();
+	void ThrowObject();
 //	void TakeDamage(int32 Damage);
 //	void RegainHealth(int32 Healing);
 
