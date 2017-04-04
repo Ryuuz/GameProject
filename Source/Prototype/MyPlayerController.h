@@ -27,6 +27,21 @@ public:
 //	void TakeDamage(int32 Damage);
 //	void RegainHealth(int32 Healing);
 
+
+	void StartRotationUp();
+	void StopRotationUp();
+
+	void StartRotationDown();
+	void StopRotationDown();
+
+	void StartRotationRight();
+	void StopRotationRight();
+
+	void StartRotationLeft();
+	void StopRotationLeft();
+
+
+
 private:
 	int32 Health;
 	bool Lantern;

@@ -24,6 +24,19 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AMyPlayerController::Interacting);
 	InputComponent->BindAction("Interact", IE_Released, this, &AMyPlayerController::StopInteracting);
 	InputComponent->BindAction("Throw", IE_Pressed, this, &AMyPlayerController::ThrowObject);
+
+
+	InputComponent->BindAction("RotationUp", IE_Pressed, this, &AMyPlayerController::StartRotationUp);
+	InputComponent->BindAction("RotationUp", IE_Released, this, &AMyPlayerController::StopRotationUp);
+
+	InputComponent->BindAction("RotationDown", IE_Pressed, this, &AMyPlayerController::StartRotationDown);
+	InputComponent->BindAction("RotationDown", IE_Released, this, &AMyPlayerController::StopRotationDown);
+
+	InputComponent->BindAction("RotationRight", IE_Pressed, this, &AMyPlayerController::StartRotationRight);
+	InputComponent->BindAction("RotationRight", IE_Released, this, &AMyPlayerController::StopRotationRight);
+
+	InputComponent->BindAction("RotationLeft", IE_Pressed, this, &AMyPlayerController::StartRotationLeft);
+	InputComponent->BindAction("RotationLeft", IE_Released, this, &AMyPlayerController::StopRotationLeft);
 }
 
 
@@ -100,6 +113,93 @@ void AMyPlayerController::ThrowObject()
 		Player->ThrowItem();
 	}
 }
+
+
+
+void AMyPlayerController::StartRotationUp()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StartRotationUp();
+	}
+}
+void AMyPlayerController::StopRotationUp()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopRotationUp();
+	}
+}
+
+
+void AMyPlayerController::StartRotationDown()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StartRotationDown();
+	}
+}
+void AMyPlayerController::StopRotationDown()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopRotationDown();
+	}
+}
+
+
+void AMyPlayerController::StartRotationRight()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StartRotationRight();
+	}
+}
+void AMyPlayerController::StopRotationRight()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopRotationRight();
+	}
+}
+
+
+void AMyPlayerController::StartRotationLeft()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StartRotationLeft();
+	}
+}
+void AMyPlayerController::StopRotationLeft()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->StopRotationLeft();
+	}
+}
+
+
+
+
+
+
 
 
 /*

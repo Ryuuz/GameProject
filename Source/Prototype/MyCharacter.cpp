@@ -50,7 +50,28 @@ void AMyCharacter::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 	Raycast();
+
+
+	//handles rotation of character
+	
+	//if (upRot == 1 || downRot == 1 || leftRot == 1 || rightRot == 1) {
+		AverageRot = CurrentRot / (upRot + downRot + leftRot + rightRot);
+
+
+		if (upRot == 1 && rightRot == 1 && downRot == 0 && leftRot == 0) {
+			AverageRot = 0;
+		}
+		if (upRot == 1 && rightRot == 1 && downRot == 0 && leftRot == 1) {
+			AverageRot = -45;
+		}
+
+		FRotator RotationSet = FRotator(0, AverageRot, 0);
+		PlayerMesh->SetWorldRotation(RotationSet);
+
+	//}
+	
 }
+
 
 
 // Called to bind functionality to input
@@ -156,6 +177,73 @@ void AMyCharacter::ThrowItem()
 		HoldingItem = false;
 	}
 }
+
+
+
+
+//SETS ROTATION VALUES ON KEY DOWN AND REMOVES THEM ON KEY UP
+void AMyCharacter::StartRotationUp()
+{
+	upRot = 1;
+	CurrentRot -= 45;
+}
+void AMyCharacter::StopRotationUp()
+{
+	upRot = 0;
+	CurrentRot += 45;
+}
+
+
+void AMyCharacter::StartRotationDown()
+{
+	downRot = 1;
+	CurrentRot -= 225;
+}
+void AMyCharacter::StopRotationDown()
+{
+	downRot = 0;
+	CurrentRot += 225;
+}
+
+
+void AMyCharacter::StartRotationLeft()
+{
+	leftRot = 1;
+	CurrentRot -= 135;
+}
+void AMyCharacter::StopRotationLeft()
+{
+	leftRot = 0;
+	CurrentRot += 135;
+}
+
+
+void AMyCharacter::StartRotationRight()
+{
+	rightRot = 1;
+	CurrentRot -= 315;
+}
+void AMyCharacter::StopRotationRight()
+{
+	rightRot = 0;
+	CurrentRot += 315;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //Casts a ray and sees if it hits a tree

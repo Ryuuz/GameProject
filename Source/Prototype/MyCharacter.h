@@ -32,6 +32,19 @@ public:
 	void ThrowItem();
 	void Raycast();
 
+
+	void StartRotationUp();
+	void StopRotationUp();
+
+	void StartRotationDown();
+	void StopRotationDown();
+
+	void StartRotationRight();
+	void StopRotationRight();
+
+	void StartRotationLeft();
+	void StopRotationLeft();
+
 	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
 
 	UFUNCTION()
@@ -54,4 +67,10 @@ private:
 	bool AttemptInteract;
 	bool HoldingItem;
 	bool Consumeable;
+	float AverageRot;
+	float CurrentRot;
+	int upRot;
+	int downRot;
+	int leftRot;
+	int rightRot;
 };

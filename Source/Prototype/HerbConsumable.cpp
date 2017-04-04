@@ -12,6 +12,12 @@ AHerbConsumable::AHerbConsumable()
 		VisibleComponent->SetStaticMesh(HerbAsset.Object);
 		VisibleComponent->SetWorldScale3D(FVector(0.2f, 0.2f, 0.4f));
 	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatHerb(TEXT("Material'/Game/mats/Herbs.Herbs'"));
+	if (MatHerb.Succeeded())
+	{
+		VisibleComponent->SetMaterial(0, MatHerb.Object);
+	}
 }
 
 void AHerbConsumable::BeginPlay()
