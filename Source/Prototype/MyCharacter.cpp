@@ -3,6 +3,7 @@
 #include "Prototype.h"
 #include "MyPlayerController.h"
 #include "PickUp.h"
+#include "Rock.h"
 #include "RockProjectile.h"
 #include "MyCharacter.h"
 
@@ -137,6 +138,31 @@ void AMyCharacter::Interacting()
 			else if (Obj->ActorHasTag("Consumable"))
 			{
 				Obj->Destroy();
+			}
+			else if (Obj->ActorHasTag("Projectile") && !HoldingItem)
+			{
+				FVector ItemPos = Obj->GetActorLocation();
+				FRotator ItemRot = Obj->GetActorRotation();
+				Obj->Destroy();
+
+				UWorld* World = GetWorld();
+				if (World)
+				{
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = Instigator;
+
+					ARock* Rock = World->SpawnActor<ARock>(ARock::StaticClass(), ItemPos, ItemRot, SpawnParams);
+
+					if (Rock)
+					{
+						Rock->SetActorEnableCollision(false);
+						Rock->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("RightHand")));
+						AttemptInteract = true;
+						HoldingItem = true;
+						HeldObject = Cast<APickUp>(Rock);
+					}
+				}
 			}
 		}
 	}

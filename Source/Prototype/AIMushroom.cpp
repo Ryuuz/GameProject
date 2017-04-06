@@ -20,11 +20,12 @@ AAIMushroom::AAIMushroom()
 	ShroomMesh->SetupAttachment(RootComponent);
 	PawnSensingComp->SetPeripheralVisionAngle(90.f);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));//"StaticMesh'/Game/Meshes/sopp_fin_color_moshroom_body.sopp_fin_color_moshroom_body'"));
 	if (AIAsset.Succeeded())
 	{
 		ShroomMesh->SetStaticMesh(AIAsset.Object);
 		ShroomMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
+		//ShroomMesh->SetRelativeRotation(FRotator(90.f, 0.f, 90.f));
 	}
 
 	ChasingPlayer = false;

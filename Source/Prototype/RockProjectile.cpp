@@ -41,6 +41,7 @@ void ARockProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Tags.Add(FName("Projectile"));
 }
 
 // Called every frame
