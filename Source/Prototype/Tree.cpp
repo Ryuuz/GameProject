@@ -21,7 +21,7 @@ ATree::ATree()
 		TreeMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 4.f));
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatTrunk(TEXT("Material'/Game/mats/Trunk.Trunk'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatTrunk(TEXT("Material'/Game/Material/M_Trunk.M_Trunk'"));
 	if (MatTrunk.Succeeded())
 	{
 		TreeMesh->SetMaterial(0, MatTrunk.Object);

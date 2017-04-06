@@ -16,7 +16,7 @@ ARockProjectile::ARockProjectile()
 
 	CollisionComponent->InitSphereRadius(10.f);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Game/Meshes/Rock.Rock'"));
 	if (RockAsset.Succeeded())
 	{
 		VisibleComponent->SetStaticMesh(RockAsset.Object);
