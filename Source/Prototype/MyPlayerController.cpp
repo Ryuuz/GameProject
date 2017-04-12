@@ -9,7 +9,6 @@
 AMyPlayerController::AMyPlayerController(const class FObjectInitializer & ObjectInitializer) : Super(ObjectInitializer)
 {
 	Health = 100;
-	Lantern = false;
 }
 
 
@@ -104,6 +103,8 @@ void AMyPlayerController::StopInteracting()
 		Player->StopInteracting();
 	}
 }
+
+
 void AMyPlayerController::ThrowObject()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());

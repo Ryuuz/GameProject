@@ -17,5 +17,5 @@ public:
 	AAIShroomController();
 	void SetPlayerAsSeen(APawn* Player);
 	virtual void Possess(APawn* AIChar) override;
-	void ReturnToStart(FVector StartPosition);
+	void ReturnToStart(FVector StartPosition);	
 };

@@ -21,6 +21,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void DistanceFromStart();
 	void MoveForward();
+	void HeardSound(AActor* Origin);
 
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
@@ -30,12 +31,22 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float AreaRadius = 600.f;
+
+	UPROPERTY(EditAnywhere)
+	float ChaseDistance = 1000.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bPatrolling = true;
 	
 private:
 	UFUNCTION()
 	void OnPlayerSeen(APawn* pawn);
 
 	FVector StartPosition;
-	bool ChasingPlayer;
-	bool Returning;
+	bool bChasingPlayer;
+	bool bReturning;
+	bool bInvestigating;
+
+	float InvestigationStart;
+	float InvestigationTime;
 };

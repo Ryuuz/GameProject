@@ -44,5 +44,4 @@ public:
 
 private:
 	int32 Health;
-	bool Lantern;
 };

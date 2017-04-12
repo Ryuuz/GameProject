@@ -22,7 +22,7 @@ AMyCharacter::AMyCharacter()
 	GetCapsuleComponent()->InitCapsuleSize(30.f, 60.f);
 
 	CollisionComponent->SetRelativeLocation(FVector(0.f, 0.f, 5.f));
-	PlayerCamera->SetRelativeLocation(FVector(-320.f, 350.f, 380.f));
+	PlayerCamera->SetRelativeLocation(FVector(-450.f, 440.f, 525.f));
 	PlayerCamera->SetWorldRotation(FRotator(-40.f, -45.1f, 0.f));
 
 	PlayerMesh->SetupAttachment(RootComponent);
@@ -31,8 +31,8 @@ AMyCharacter::AMyCharacter()
 
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
 
-	AttemptInteract = false;
-	HoldingItem = false;
+	bAttemptInteract = false;
+	bHoldingItem = false;
 	HeldObject = nullptr;
 }
 
@@ -110,6 +110,7 @@ void AMyCharacter::JumpUp()
 	ACharacter::Jump();
 }
 
+
 void AMyCharacter::StopJump()
 {
 	ACharacter::StopJumping();
@@ -122,25 +123,26 @@ void AMyCharacter::Interacting()
 	TArray<AActor*> Overlapping;
 	GetOverlappingActors(Overlapping);
 
-	//Check if there's a PickUp object, and pick it up if there is
+	//Check if there's an object to interact with, and pick it up if player isn't holding anything from before
 	for (auto Obj : Overlapping)
 	{
-		if (AttemptInteract == false)
+		if (bAttemptInteract == false)
 		{
-			if ((Obj->ActorHasTag("PickUp") && HoldingItem == false))
+			if ((Obj->ActorHasTag("PickUp") && bHoldingItem == false))
 			{
 				Obj->SetActorEnableCollision(false);
 				Obj->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("RightHand")));
-				AttemptInteract = true;
-				HoldingItem = true;
+				bAttemptInteract = true;
+				bHoldingItem = true;
 				HeldObject = Cast<APickUp>(Obj);
 			}
 			else if (Obj->ActorHasTag("Consumable"))
 			{
 				Obj->Destroy();
 			}
-			else if (Obj->ActorHasTag("Projectile") && !HoldingItem)
+			else if (Obj->ActorHasTag("Projectile") && !bHoldingItem)
 			{
+				//Creates a 'PickUp' item with the same location and rotation that the player can hold
 				FVector ItemPos = Obj->GetActorLocation();
 				FRotator ItemRot = Obj->GetActorRotation();
 				Obj->Destroy();
@@ -158,8 +160,8 @@ void AMyCharacter::Interacting()
 					{
 						Rock->SetActorEnableCollision(false);
 						Rock->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("RightHand")));
-						AttemptInteract = true;
-						HoldingItem = true;
+						bAttemptInteract = true;
+						bHoldingItem = true;
 						HeldObject = Cast<APickUp>(Rock);
 					}
 				}
@@ -171,12 +173,14 @@ void AMyCharacter::Interacting()
 
 void AMyCharacter::StopInteracting()
 {
-	AttemptInteract = false;
+	bAttemptInteract = false;
 }
 
+
+//Throws the held rock by creating a projectile version of it
 void AMyCharacter::ThrowItem()
 {
-	if (HoldingItem)
+	if (bHoldingItem && HeldObject->IsA(ARock::StaticClass()))
 	{
 		FVector ItemPos = HeldObject->GetActorLocation();
 		FRotator ItemRot = HeldObject->GetActorRotation();
@@ -200,7 +204,7 @@ void AMyCharacter::ThrowItem()
 		}
 
 		HeldObject = nullptr;
-		HoldingItem = false;
+		bHoldingItem = false;
 	}
 }
 

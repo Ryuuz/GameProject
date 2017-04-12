@@ -6,12 +6,18 @@
 
 ARock::ARock()
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Game/Meshes/Rock.Rock'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (RockAsset.Succeeded())
 	{
 		VisibleComponent->SetStaticMesh(RockAsset.Object);
 		VisibleComponent->SetWorldScale3D(FVector(0.2f, 0.2f, 0.2f));
 		VisibleComponent->SetSimulatePhysics(false);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatRock(TEXT("Material'/Game/Material/M_Stone.M_Stone'"));
+	if (MatRock.Succeeded())
+	{
+		VisibleComponent->SetMaterial(0, MatRock.Object);
 	}
 }
 

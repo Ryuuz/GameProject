@@ -6,7 +6,7 @@ public class Prototype : ModuleRules
 {
 	public Prototype(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "GameplayTasks" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "GameplayTasks", "Landscape" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

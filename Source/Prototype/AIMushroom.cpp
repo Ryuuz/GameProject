@@ -7,6 +7,7 @@
 #include "AIShroomController.h"
 #include "AIMushroom.h"
 
+//TO DO: Turn around if colliding with anything other than the player
 
 // Sets default values
 AAIMushroom::AAIMushroom()
@@ -20,16 +21,16 @@ AAIMushroom::AAIMushroom()
 	ShroomMesh->SetupAttachment(RootComponent);
 	PawnSensingComp->SetPeripheralVisionAngle(90.f);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));//"StaticMesh'/Game/Meshes/sopp_fin_color_moshroom_body.sopp_fin_color_moshroom_body'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (AIAsset.Succeeded())
 	{
 		ShroomMesh->SetStaticMesh(AIAsset.Object);
 		ShroomMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
-		//ShroomMesh->SetRelativeRotation(FRotator(90.f, 0.f, 90.f));
 	}
 
-	ChasingPlayer = false;
-	Returning = false;
+	bChasingPlayer = false;
+	bReturning = false;
+	bInvestigating = false;
 }
 
 
@@ -53,11 +54,30 @@ void AAIMushroom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bInvestigating)
+	{
+		if ((GetWorld()->GetTimeSeconds() - InvestigationStart) >= InvestigationTime)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Turning investigation false"));
+			bInvestigating = false;
+
+			if (!bPatrolling)
+			{
+				AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
+
+				if (AIController)
+				{
+					AIController->ReturnToStart(StartPosition);
+				}
+			}
+		}
+	}
+
 	//Checks if it has gotten too far from its spawn point
 	DistanceFromStart();
 
-	//Walk around if there's no player to chase
-	if (!ChasingPlayer)
+	//Walk around if there is no player to chase
+	if (bPatrolling && !bChasingPlayer && !bInvestigating)
 	{
 		MoveForward();
 	}
@@ -74,22 +94,22 @@ void AAIMushroom::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 //Checks distance from 'StartPosition'
 void AAIMushroom::DistanceFromStart()
 {
-	//If distance is greater than 1000 units, return to 'StartPosition'
-	if ((GetActorLocation() - StartPosition).Size() > 1000.f)
+	//If distance is greater than 'ChaseDistance' units, return to 'StartPosition'
+	if ((GetActorLocation() - StartPosition).Size() > ChaseDistance)
 	{
 		AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
 
 		if (AIController)
 		{
-			Returning = true;
+			bReturning = true;
 			AIController->ReturnToStart(StartPosition);
 		}
 	}
 	//If returning from having chased a player and is within 'AreaRadius', prepare to start walking around
-	else if (Returning && (GetActorLocation() - StartPosition).Size() < AreaRadius)
+	else if (bReturning && (GetActorLocation() - StartPosition).Size() < AreaRadius)
 	{
-		ChasingPlayer = false;
-		Returning = false;
+		bChasingPlayer = false;
+		bReturning = false;
 	}
 }
 
@@ -115,6 +135,25 @@ void AAIMushroom::MoveForward()
 }
 
 
+void AAIMushroom::HeardSound(AActor* Origin)
+{
+	AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
+
+	if (AIController)
+	{
+		bInvestigating = true;
+		float Dist = GetDistanceTo(Origin);
+
+		InvestigationTime = (Dist / 100) + 5;
+		InvestigationStart = GetWorld()->GetTimeSeconds();
+
+		UE_LOG(LogTemp, Warning, TEXT("Investigation time is %f"), InvestigationTime);
+
+		AIController->MoveToActor(Origin);
+	}
+}
+
+
 //When player enters the AI's sight
 void AAIMushroom::OnPlayerSeen(APawn* pawn)
 {
@@ -122,7 +161,7 @@ void AAIMushroom::OnPlayerSeen(APawn* pawn)
 
 	if (pawn->ActorHasTag("Player") && AIController)
 	{
-		ChasingPlayer = true;
+		bChasingPlayer = true;
 		AIController->SetPlayerAsSeen(pawn);
 	}
 }

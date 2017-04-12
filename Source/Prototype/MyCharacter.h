@@ -32,7 +32,6 @@ public:
 	void ThrowItem();
 	void Raycast();
 
-
 	void StartRotationUp();
 	void StopRotationUp();
 
@@ -44,8 +43,6 @@ public:
 
 	void StartRotationLeft();
 	void StopRotationLeft();
-
-	FORCEINLINE bool GetLanternStatus() const { return Lantern; }
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -59,16 +56,20 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ARockProjectile> ThrowClass;
 	
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* PlayerCamera;
+
 private:
 	FVector CurrentVelocity;
-	UCameraComponent* PlayerCamera;
+	
 	class APickUp* HeldObject;
-	bool Lantern = true;
-	bool AttemptInteract;
-	bool HoldingItem;
-	bool Consumeable;
+	
+	bool bAttemptInteract;
+	bool bHoldingItem;
+	
 	float AverageRot;
 	float CurrentRot;
+	
 	int upRot;
 	int downRot;
 	int leftRot;

@@ -23,6 +23,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void ThrowInDirection(const FVector& ThrowDirection);
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 	UPROPERTY(VisibleDefaultsonly)
 	USphereComponent* CollisionComponent;
 
@@ -31,4 +34,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* ProjectileComponent;
+
+private:
+	bool bTouchedGround;
 };
