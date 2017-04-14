@@ -24,6 +24,7 @@ public:
 	void Interacting();
 	void StopInteracting();
 	void ThrowObject();
+	void SwingStick();
 //	void TakeDamage(int32 Damage);
 //	void RegainHealth(int32 Healing);
 

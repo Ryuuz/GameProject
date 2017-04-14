@@ -6,6 +6,7 @@
 
 ARock::ARock()
 {
+	//Set Mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (RockAsset.Succeeded())
 	{
@@ -14,6 +15,7 @@ ARock::ARock()
 		VisibleComponent->SetSimulatePhysics(false);
 	}
 
+	//Apply material
 	static ConstructorHelpers::FObjectFinder<UMaterial> MatRock(TEXT("Material'/Game/Material/M_Stone.M_Stone'"));
 	if (MatRock.Succeeded())
 	{

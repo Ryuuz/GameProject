@@ -5,6 +5,8 @@
 #include "PickUp.h"
 #include "Rock.h"
 #include "RockProjectile.h"
+#include "Stick.h"
+#include "AIMushroom.h"
 #include "MyCharacter.h"
 
 
@@ -21,6 +23,14 @@ AMyCharacter::AMyCharacter()
 	CollisionComponent->InitCapsuleSize(45.f, 70.f);
 	GetCapsuleComponent()->InitCapsuleSize(30.f, 60.f);
 
+	//Set mesh
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlayerAsset(TEXT("StaticMesh'/Game/Meshes/CharMesh.CharMesh'"));
+	if (PlayerAsset.Succeeded())
+	{
+		PlayerMesh->SetStaticMesh(PlayerAsset.Object);
+		PlayerMesh->SetRelativeLocation(FVector(0.f, 0.f, -50.f));
+	}
+
 	CollisionComponent->SetRelativeLocation(FVector(0.f, 0.f, 5.f));
 	PlayerCamera->SetRelativeLocation(FVector(-450.f, 440.f, 525.f));
 	PlayerCamera->SetWorldRotation(FRotator(-40.f, -45.1f, 0.f));
@@ -30,6 +40,12 @@ AMyCharacter::AMyCharacter()
 	PlayerCamera->SetupAttachment(RootComponent);
 
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlapBegin);
+
+	GetCharacterMovement()->MaxWalkSpeed = 250.f;
+	bUseControllerRotationYaw = false;
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
+	AutoReceiveInput = EAutoReceiveInput::Player0;
+	AIControllerClass = AMyPlayerController::StaticClass();
 
 	bAttemptInteract = false;
 	bHoldingItem = false;
@@ -70,9 +86,7 @@ void AMyCharacter::Tick( float DeltaTime )
 		PlayerMesh->SetWorldRotation(RotationSet);
 
 	//}
-	
 }
-
 
 
 // Called to bind functionality to input
@@ -120,6 +134,7 @@ void AMyCharacter::StopJump()
 void AMyCharacter::Interacting()
 {
 	//Get all actors within player's collision component
+	//----Consider using sphere trace instead
 	TArray<AActor*> Overlapping;
 	GetOverlappingActors(Overlapping);
 
@@ -128,7 +143,7 @@ void AMyCharacter::Interacting()
 	{
 		if (bAttemptInteract == false)
 		{
-			if ((Obj->ActorHasTag("PickUp") && bHoldingItem == false))
+			if ((Obj->ActorHasTag("PickUp") && !bHoldingItem))
 			{
 				Obj->SetActorEnableCollision(false);
 				Obj->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("RightHand")));
@@ -138,6 +153,7 @@ void AMyCharacter::Interacting()
 			}
 			else if (Obj->ActorHasTag("Consumable"))
 			{
+				//Switch out with a Consume function in the Consumable class once made
 				Obj->Destroy();
 			}
 			else if (Obj->ActorHasTag("Projectile") && !bHoldingItem)
@@ -156,6 +172,7 @@ void AMyCharacter::Interacting()
 
 					ARock* Rock = World->SpawnActor<ARock>(ARock::StaticClass(), ItemPos, ItemRot, SpawnParams);
 
+					//Attach item to player
 					if (Rock)
 					{
 						Rock->SetActorEnableCollision(false);
@@ -177,9 +194,9 @@ void AMyCharacter::StopInteracting()
 }
 
 
-//Throws the held rock by creating a projectile version of it
 void AMyCharacter::ThrowItem()
 {
+	//Throws the held rock by creating a projectile version of it
 	if (bHoldingItem && HeldObject->IsA(ARock::StaticClass()))
 	{
 		FVector ItemPos = HeldObject->GetActorLocation();
@@ -205,6 +222,56 @@ void AMyCharacter::ThrowItem()
 
 		HeldObject = nullptr;
 		bHoldingItem = false;
+	}
+	//Drops the held stick
+	else if (bHoldingItem && HeldObject->IsA(AStick::StaticClass()))
+	{
+		HeldObject->DetachRootComponentFromParent();
+		HeldObject->SetActorEnableCollision(true);
+		Cast<AStick>(HeldObject)->TogglePhysics(true);
+
+		HeldObject = nullptr;
+		bHoldingItem = false;
+	}
+}
+
+
+void AMyCharacter::SwingStick()
+{
+	if (bHoldingItem && HeldObject->IsA(AStick::StaticClass()))
+	{
+		FVector Origin;
+		FVector Bounds;
+		FVector EndPoint;
+		
+		//Sphere trace to see if any enemies are hit
+		HeldObject->GetActorBounds(false, Origin, Bounds);
+		EndPoint = GetActorForwardVector()*Bounds.Y;
+		
+		TArray<FHitResult> ActorsHit;
+		FVector StartLoc = Origin;
+		FVector EndLoc = Origin+EndPoint;
+		float Radius = Bounds.Y;
+
+		ECollisionChannel CollideWith = ECollisionChannel::ECC_Pawn;
+		FCollisionShape CollisionShape;
+		CollisionShape.ShapeType = ECollisionShape::Sphere;
+		CollisionShape.SetSphere(Radius);
+		FCollisionObjectQueryParams CollisionParam(ECollisionChannel::ECC_Pawn);
+
+		bool bHitEnemy = GetWorld()->SweepMultiByObjectType(ActorsHit, StartLoc, EndLoc, FQuat::FQuat(), CollisionParam, CollisionShape);
+
+		//Checks if it object is enemy, and stuns it if it is
+		if (bHitEnemy)
+		{
+			for (auto Enemy : ActorsHit)
+			{
+				if (Enemy.GetActor()->ActorHasTag("Enemy"))
+				{
+					Cast<AAIMushroom>(Enemy.GetActor())->Stun(5.f);
+				}
+			}
+		}
 	}
 }
 
@@ -295,11 +362,11 @@ void AMyCharacter::Raycast()
 }
 
 
+//-----Consider using OnHit on capsule component (see AI Muyshroom)
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
-		OtherActor->Destroy();
 		//Cast<AMyPlayerController>(GetController())->TakeDamage(10);
 	}
 }

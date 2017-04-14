@@ -22,6 +22,10 @@ public:
 	void DistanceFromStart();
 	void MoveForward();
 	void HeardSound(AActor* Origin);
+	void Stun(float StunTime);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
@@ -35,6 +39,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ChaseDistance = 1000.f;
 
+	//Uncheck in editor to have the AI remain stationary
 	UPROPERTY(EditAnywhere)
 	bool bPatrolling = true;
 	
@@ -46,7 +51,10 @@ private:
 	bool bChasingPlayer;
 	bool bReturning;
 	bool bInvestigating;
+	bool bStunned;
 
 	float InvestigationStart;
 	float InvestigationTime;
+	float TimeStunned;
+	float StunStart;
 };

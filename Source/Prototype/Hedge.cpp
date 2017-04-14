@@ -14,6 +14,7 @@ AHedge::AHedge()
 	HedgeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HedgeMesh"));
 	HedgeMesh->SetupAttachment(RootComponent);
 
+	//Set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> HedgeAsset(TEXT("StaticMesh'/Game/Meshes/Mesh_Hedge.Mesh_Hedge'"));
 	if (HedgeAsset.Succeeded())
 	{
@@ -21,12 +22,14 @@ AHedge::AHedge()
 	}
 }
 
+
 // Called when the game starts or when spawned
 void AHedge::BeginPlay()
 {
 	Super::BeginPlay();
 	Tags.Add(FName("Tree"));
 }
+
 
 // Called every frame
 void AHedge::Tick(float DeltaTime)

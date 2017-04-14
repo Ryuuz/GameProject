@@ -16,6 +16,7 @@ AConsumable::AConsumable()
 	VisibleComponent->SetupAttachment(RootComponent);
 }
 
+
 // Called when the game starts or when spawned
 void AConsumable::BeginPlay()
 {
@@ -23,6 +24,7 @@ void AConsumable::BeginPlay()
 	
 	Tags.Add(FName("Consumable"));
 }
+
 
 // Called every frame
 void AConsumable::Tick(float DeltaTime)

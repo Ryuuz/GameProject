@@ -21,6 +21,7 @@ AAIMushroom::AAIMushroom()
 	ShroomMesh->SetupAttachment(RootComponent);
 	PawnSensingComp->SetPeripheralVisionAngle(90.f);
 
+	//Set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (AIAsset.Succeeded())
 	{
@@ -28,9 +29,15 @@ AAIMushroom::AAIMushroom()
 		ShroomMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
 	}
 
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AAIMushroom::OnHit);
+	GetCharacterMovement()->MaxWalkSpeed = 100.f;
+	PawnSensingComp->SightRadius = 500.f;
+	AIControllerClass = AAIShroomController::StaticClass();
+
 	bChasingPlayer = false;
 	bReturning = false;
 	bInvestigating = false;
+	bStunned = false;
 }
 
 
@@ -43,9 +50,9 @@ void AAIMushroom::BeginPlay()
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &AAIMushroom::OnPlayerSeen);
 	}
-
+	
 	StartPosition = GetActorLocation();
-	Tags.Add(FName("Enemy"));
+	Tags.Add(FName("Enemy"));	
 }
 
 
@@ -54,13 +61,21 @@ void AAIMushroom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bInvestigating)
+	//Remove stun after set time
+	if (bStunned && (GetWorld()->GetTimeSeconds() - StunStart) >= TimeStunned)
 	{
-		if ((GetWorld()->GetTimeSeconds() - InvestigationStart) >= InvestigationTime)
+		bStunned = false;
+	}
+
+	//Only move if not stunned
+	if (!bStunned)
+	{
+		//When done investigating sound
+		if (bInvestigating && (GetWorld()->GetTimeSeconds() - InvestigationStart) >= InvestigationTime)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Turning investigation false"));
 			bInvestigating = false;
 
+			//Return to original position if not patrolling
 			if (!bPatrolling)
 			{
 				AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
@@ -71,15 +86,15 @@ void AAIMushroom::Tick(float DeltaTime)
 				}
 			}
 		}
-	}
 
-	//Checks if it has gotten too far from its spawn point
-	DistanceFromStart();
+		//Checks if it has gotten too far from its spawn point
+		DistanceFromStart();
 
-	//Walk around if there is no player to chase
-	if (bPatrolling && !bChasingPlayer && !bInvestigating)
-	{
-		MoveForward();
+		//Walk around if there is no player to chase
+		if (bPatrolling && !bChasingPlayer && !bInvestigating)
+		{
+			MoveForward();
+		}
 	}
 }
 
@@ -113,6 +128,7 @@ void AAIMushroom::DistanceFromStart()
 	}
 }
 
+
 //Moves the AI forwards
 void AAIMushroom::MoveForward()
 {
@@ -135,34 +151,71 @@ void AAIMushroom::MoveForward()
 }
 
 
+//Goes to investigate sound
 void AAIMushroom::HeardSound(AActor* Origin)
 {
-	AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
-
-	if (AIController)
+	//Only moves if not stunned
+	if (!bStunned)
 	{
-		bInvestigating = true;
-		float Dist = GetDistanceTo(Origin);
+		AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
 
-		InvestigationTime = (Dist / 100) + 5;
-		InvestigationStart = GetWorld()->GetTimeSeconds();
+		if (AIController)
+		{
+			bInvestigating = true;
+			float Dist = GetDistanceTo(Origin);
 
-		UE_LOG(LogTemp, Warning, TEXT("Investigation time is %f"), InvestigationTime);
+			//Investigation time is 1 second for each 100 units, plus 5 seconds
+			InvestigationTime = (Dist / 100.f) + 5.f;
+			InvestigationStart = GetWorld()->GetTimeSeconds();
 
-		AIController->MoveToActor(Origin);
+			AIController->MoveToActor(Origin);
+		}
 	}
+}
+
+
+//Stuns the AI for 'StunTime' seconds
+void AAIMushroom::Stun(float StunTime)
+{
+	bStunned = true;
+	TimeStunned = StunTime;
+	StunStart = GetWorld()->GetTimeSeconds();
+}
+
+
+void AAIMushroom::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	//Turns around if it hits an actor other than player
+	if (!OtherActor->ActorHasTag("Player"))
+	{
+		float NewAngle = FMath::RandRange(90.f, 180.f);
+		AddActorLocalRotation(FRotator(0.f, NewAngle, 0.f));
+
+		const FRotator Rotation = GetActorRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		AddMovementInput(Direction, 1);
+	}
+
+	//Stun if it hits player?
 }
 
 
 //When player enters the AI's sight
 void AAIMushroom::OnPlayerSeen(APawn* pawn)
 {
-	AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
-
-	if (pawn->ActorHasTag("Player") && AIController)
+	//Won't chase player if stunned
+	if (!bStunned)
 	{
-		bChasingPlayer = true;
-		AIController->SetPlayerAsSeen(pawn);
+		AAIShroomController* AIController = Cast<AAIShroomController>(GetController());
+
+		if (pawn->ActorHasTag("Player") && AIController)
+		{
+			bChasingPlayer = true;
+			AIController->SetPlayerAsSeen(pawn);
+		}
 	}
 }
 

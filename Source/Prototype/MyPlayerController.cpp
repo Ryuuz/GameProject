@@ -23,6 +23,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AMyPlayerController::Interacting);
 	InputComponent->BindAction("Interact", IE_Released, this, &AMyPlayerController::StopInteracting);
 	InputComponent->BindAction("Throw", IE_Pressed, this, &AMyPlayerController::ThrowObject);
+	InputComponent->BindAction("Hit", IE_Pressed, this, &AMyPlayerController::SwingStick);
 
 
 	InputComponent->BindAction("RotationUp", IE_Pressed, this, &AMyPlayerController::StartRotationUp);
@@ -112,6 +113,17 @@ void AMyPlayerController::ThrowObject()
 	if (Player)
 	{
 		Player->ThrowItem();
+	}
+}
+
+
+void AMyPlayerController::SwingStick()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->SwingStick();
 	}
 }
 

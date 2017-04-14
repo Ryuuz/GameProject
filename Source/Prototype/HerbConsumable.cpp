@@ -6,6 +6,7 @@
 
 AHerbConsumable::AHerbConsumable()
 {
+	//Set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> HerbAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
 	if (HerbAsset.Succeeded())
 	{
@@ -13,6 +14,7 @@ AHerbConsumable::AHerbConsumable()
 		VisibleComponent->SetWorldScale3D(FVector(0.2f, 0.2f, 0.4f));
 	}
 
+	//Apply material
 	static ConstructorHelpers::FObjectFinder<UMaterial> MatHerb(TEXT("Material'/Game/Material/M_Herbs.M_Herbs'"));
 	if (MatHerb.Succeeded())
 	{
@@ -20,10 +22,12 @@ AHerbConsumable::AHerbConsumable()
 	}
 }
 
+
 void AHerbConsumable::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
 
 void AHerbConsumable::Tick(float DeltaTime)
 {

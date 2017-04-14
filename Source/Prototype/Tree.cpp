@@ -14,6 +14,7 @@ ATree::ATree()
 	TreeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TreeMesh"));
 	TreeMesh->SetupAttachment(RootComponent);
 
+	//Sets mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TreeAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
 	if (TreeAsset.Succeeded())
 	{
@@ -21,6 +22,7 @@ ATree::ATree()
 		TreeMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 4.f));
 	}
 
+	//Applies Material
 	static ConstructorHelpers::FObjectFinder<UMaterial> MatTrunk(TEXT("Material'/Game/Material/M_Trunk.M_Trunk'"));
 	if (MatTrunk.Succeeded())
 	{
@@ -28,12 +30,14 @@ ATree::ATree()
 	}
 }
 
+
 // Called when the game starts or when spawned
 void ATree::BeginPlay()
 {
 	Super::BeginPlay();
 	Tags.Add(FName("Tree"));
 }
+
 
 // Called every frame
 void ATree::Tick(float DeltaTime)

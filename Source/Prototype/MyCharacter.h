@@ -30,6 +30,8 @@ public:
 	void Interacting();
 	void StopInteracting();
 	void ThrowItem();
+	void SwingStick();
+	
 	void Raycast();
 
 	void StartRotationUp();

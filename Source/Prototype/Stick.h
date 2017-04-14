@@ -19,7 +19,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;	
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
-	
+	void TogglePhysics(bool bHasPhysics);
+
+private:
+	bool bTouchedGround;
+	bool bHitting;
 };

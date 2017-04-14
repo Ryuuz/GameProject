@@ -18,14 +18,15 @@ ARockProjectile::ARockProjectile()
 
 	CollisionComponent->InitSphereRadius(10.f);
 
+	//Set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RockAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (RockAsset.Succeeded())
 	{
 		VisibleComponent->SetStaticMesh(RockAsset.Object);
 		VisibleComponent->SetWorldScale3D(FVector(0.2f, 0.2f, 0.2f));
-		VisibleComponent->SetSimulatePhysics(false);
 	}
 
+	//Apply material
 	static ConstructorHelpers::FObjectFinder<UMaterial> MatRock(TEXT("Material'/Game/Material/M_Stone.M_Stone'"));
 	if (MatRock.Succeeded())
 	{
@@ -36,6 +37,7 @@ ARockProjectile::ARockProjectile()
 	VisibleComponent->SetupAttachment(RootComponent);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 
+	//Values for the projectile component
 	ProjectileComponent->SetUpdatedComponent(CollisionComponent);
 	ProjectileComponent->InitialSpeed = 900.f;
 	ProjectileComponent->MaxSpeed = 950.f;
@@ -47,6 +49,7 @@ ARockProjectile::ARockProjectile()
 	bTouchedGround = false;
 }
 
+
 // Called when the game starts or when spawned
 void ARockProjectile::BeginPlay()
 {
@@ -55,27 +58,32 @@ void ARockProjectile::BeginPlay()
 	Tags.Add(FName("Projectile"));
 }
 
+
 // Called every frame
 void ARockProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
+
+//The direction to throw the rock in
 void ARockProjectile::ThrowInDirection(const FVector & ThrowDirection)
 {
 	ProjectileComponent->Velocity = ThrowDirection * ProjectileComponent->InitialSpeed;
 }
 
+
 void ARockProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	bool bMadeSound = false;
 
-	//Test if GetClass is needed. Can use IsA? Are all actors children of landscape?
+	//Make sound if rock touched the ground. Will not make any more sounds after this
 	if (OtherActor->GetClass()->IsChildOf(ALandscape::StaticClass()) && !bTouchedGround)
 	{
 		bTouchedGround = true;
 		bMadeSound = true;
 	}
+	//Make sound if rock hit a tree
 	else if (OtherActor->ActorHasTag("Tree") && !bTouchedGround)
 	{
 		bMadeSound = true;	
@@ -87,8 +95,6 @@ void ARockProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		float Height = 200.f;
 		float Radius = 500.f;
 
-		UE_LOG(LogTemp, Warning, TEXT("BOOM"));
-
 		TArray<FHitResult> ActorsHit;
 		FVector StartLoc = GetActorLocation();
 		FVector EndLoc = GetActorLocation();
@@ -98,17 +104,17 @@ void ARockProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		FCollisionShape CollisionShape;
 		CollisionShape.ShapeType = ECollisionShape::Sphere;
 		CollisionShape.SetSphere(Radius);
-		FCollisionObjectQueryParams Rawr(ECollisionChannel::ECC_Pawn);
+		FCollisionObjectQueryParams CollisionParam(ECollisionChannel::ECC_Pawn);
 
-		bool bHitEnemy = GetWorld()->SweepMultiByObjectType(ActorsHit, StartLoc, EndLoc, FQuat::FQuat(), Rawr, CollisionShape);
+		bool bHitEnemy = GetWorld()->SweepMultiByObjectType(ActorsHit, StartLoc, EndLoc, FQuat::FQuat(), CollisionParam, CollisionShape);
 
+		//Of something was hit, check if it was an enemy and call the 'HeardSound' function if it was
 		if (bHitEnemy)
 		{
 			for (auto Enemy : ActorsHit)
 			{
 				if (Enemy.GetActor()->ActorHasTag("Enemy"))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *Enemy.Actor->GetName());
 					Cast<AAIMushroom>(Enemy.GetActor())->HeardSound(this);
 				}				
 			}
