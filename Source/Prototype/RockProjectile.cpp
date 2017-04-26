@@ -88,6 +88,10 @@ void ARockProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	{
 		bMadeSound = true;	
 	}
+	else if (OtherActor->ActorHasTag("Enemy") && !bTouchedGround)
+	{
+		Cast<AAIMushroom>(OtherActor)->Stun(2.f);
+	}
 	
 	//Gets all enemies in a radius of 'Radius'. Made following http://orfeasel.com/tracing-multiple-objects/
 	if (bMadeSound)

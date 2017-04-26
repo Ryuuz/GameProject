@@ -7,7 +7,6 @@
 #include "AIShroomController.h"
 #include "AIMushroom.h"
 
-//TO DO: Turn around if colliding with anything other than the player
 
 // Sets default values
 AAIMushroom::AAIMushroom()
@@ -22,11 +21,12 @@ AAIMushroom::AAIMushroom()
 	PawnSensingComp->SetPeripheralVisionAngle(90.f);
 
 	//Set mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AIAsset(TEXT("StaticMesh'/Game/Meshes/Mushroom.Mushroom'"));
 	if (AIAsset.Succeeded())
 	{
 		ShroomMesh->SetStaticMesh(AIAsset.Object);
-		ShroomMesh->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
+		ShroomMesh->SetWorldScale3D(FVector(1.f, 1.f, 1.f));
+		ShroomMesh->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
 	}
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AAIMushroom::OnHit);
