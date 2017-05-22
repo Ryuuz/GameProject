@@ -7,6 +7,7 @@
 #include "AIShroomController.h"
 #include "AIMushroom.h"
 
+//Several functions could be moved to the controller for the other AIs, but meh
 
 // Sets default values
 AAIMushroom::AAIMushroom()
@@ -52,6 +53,7 @@ void AAIMushroom::BeginPlay()
 	}
 	
 	StartPosition = GetActorLocation();
+	StartRotation = GetActorRotation();
 	Tags.Add(FName("Enemy"));	
 }
 
@@ -85,6 +87,15 @@ void AAIMushroom::Tick(float DeltaTime)
 					AIController->ReturnToStart(StartPosition);
 				}
 			}
+		}
+
+		if (!bPatrolling && !bInvestigating && !bChasingPlayer && !bReturning)
+		{
+			if (GetActorRotation() != StartRotation)
+			{
+				SetActorRotation(StartRotation);
+			}
+
 		}
 
 		//Checks if it has gotten too far from its spawn point
@@ -186,7 +197,7 @@ void AAIMushroom::Stun(float StunTime)
 void AAIMushroom::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//Turns around if it hits an actor other than player
-	if (!OtherActor->ActorHasTag("Player"))
+	if (!OtherActor->ActorHasTag("Player") && !bChasingPlayer && !bInvestigating)
 	{
 		float NewAngle = FMath::RandRange(90.f, 180.f);
 		AddActorLocalRotation(FRotator(0.f, NewAngle, 0.f));
@@ -214,7 +225,7 @@ void AAIMushroom::OnPlayerSeen(APawn* pawn)
 		if (pawn->ActorHasTag("Player") && AIController)
 		{
 			bChasingPlayer = true;
-			AIController->SetPlayerAsSeen(pawn);
+			AIController->SetPlayerAsSeen(pawn, 0.5f);
 		}
 	}
 }

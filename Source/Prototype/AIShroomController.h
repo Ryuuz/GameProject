@@ -15,7 +15,7 @@ class PROTOTYPE_API AAIShroomController : public AAIController
 
 public:
 	AAIShroomController();
-	void SetPlayerAsSeen(APawn* Player);
+	void SetPlayerAsSeen(APawn* Player, float Proximity);
 	virtual void Possess(APawn* AIChar) override;
 	void ReturnToStart(FVector StartPosition);	
 };

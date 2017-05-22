@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "AIController.h"
-#include "AIPatrolController.generated.h"
+#include "Consumable.h"
+#include "LanternOil.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROTOTYPE_API AAIPatrolController : public AAIController
+class PROTOTYPE_API ALanternOil : public AConsumable
 {
 	GENERATED_BODY()
 	

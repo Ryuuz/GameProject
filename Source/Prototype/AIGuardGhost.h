@@ -11,20 +11,38 @@ class PROTOTYPE_API AAIGuardGhost : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AAIGuardGhost();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void Stun(float StunTime);
+	void SphereTrace();
+	void InvestigateObject(TArray<FHitResult> Objs);
 
-	
-	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* GuardMesh;
+
+	UPROPERTY(EditAnywhere)
+	float AcceptableDistance = 600.f;
+
+private:
+	FVector StartPosition;
+	FRotator GuardDirection;
+	TArray<AActor*> InvestigatedObjs;
+
+	bool bReturning;
+	bool bInvestigating;
+	bool bStunned;
+
+	float InvestigationStart;
+	float InvestigationTime;
+	float TimeStunned;
+	float StunStart;
 };

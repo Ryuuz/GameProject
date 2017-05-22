@@ -7,6 +7,8 @@
 #include "RockProjectile.h"
 #include "Stick.h"
 #include "AIMushroom.h"
+#include "CrystalPiece.h"
+#include "CrystalProjectile.h"
 #include "MyCharacter.h"
 
 
@@ -161,7 +163,7 @@ void AMyCharacter::Interacting()
 				//Creates a 'PickUp' item with the same location and rotation that the player can hold
 				FVector ItemPos = Obj->GetActorLocation();
 				FRotator ItemRot = Obj->GetActorRotation();
-				Obj->Destroy();
+				
 
 				UWorld* World = GetWorld();
 				if (World)
@@ -170,7 +172,18 @@ void AMyCharacter::Interacting()
 					SpawnParams.Owner = this;
 					SpawnParams.Instigator = Instigator;
 
-					ARock* Rock = World->SpawnActor<ARock>(ARock::StaticClass(), ItemPos, ItemRot, SpawnParams);
+					APickUp* Rock;
+
+					if (Obj->IsA(ARockProjectile::StaticClass()))
+					{
+						Rock = World->SpawnActor<ARock>(ARock::StaticClass(), ItemPos, ItemRot, SpawnParams);
+					}
+					else
+					{
+						Rock = World->SpawnActor<ACrystalPiece>(ACrystalPiece::StaticClass(), ItemPos, ItemRot, SpawnParams);
+					}
+					
+					Obj->Destroy();
 
 					//Attach item to player
 					if (Rock)
@@ -212,6 +225,32 @@ void AMyCharacter::ThrowItem()
 			SpawnParams.Instigator = Instigator;
 
 			ARockProjectile* Projectile = World->SpawnActor<ARockProjectile>(ARockProjectile::StaticClass(), ItemPos, ItemRot, SpawnParams);
+
+			if (Projectile)
+			{
+				FVector LaunchDirection = ItemRot.Vector();
+				Projectile->ThrowInDirection(LaunchDirection);
+			}
+		}
+
+		HeldObject = nullptr;
+		bHoldingItem = false;
+	}
+	else if (bHoldingItem && HeldObject->IsA(ACrystalPiece::StaticClass()))
+	{
+		FVector ItemPos = HeldObject->GetActorLocation();
+		FRotator ItemRot = HeldObject->GetActorRotation();
+		ItemRot.Pitch += 20.f;
+		HeldObject->Destroy();
+
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+
+			ACrystalProjectile* Projectile = World->SpawnActor<ACrystalProjectile>(ACrystalProjectile::StaticClass(), ItemPos, ItemRot, SpawnParams);
 
 			if (Projectile)
 			{

@@ -12,9 +12,9 @@ AAIShroomController::AAIShroomController()
 
 
 //If AI has seen the player, it starts chasing said player
-void AAIShroomController::SetPlayerAsSeen(APawn * Player)
+void AAIShroomController::SetPlayerAsSeen(APawn * Player, float Proximity)
 {
-	MoveToActor(Player, 0.5f);
+	MoveToActor(Player, Proximity);
 }
 
 

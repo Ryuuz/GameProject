@@ -48,6 +48,7 @@ private:
 	void OnPlayerSeen(APawn* pawn);
 
 	FVector StartPosition;
+	FRotator StartRotation;
 	bool bChasingPlayer;
 	bool bReturning;
 	bool bInvestigating;
