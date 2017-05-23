@@ -24,7 +24,7 @@ AMyCharacter::AMyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
+	PlayerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlayerMesh"));
 	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionComp"));
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 
@@ -32,11 +32,12 @@ AMyCharacter::AMyCharacter()
 	GetCapsuleComponent()->InitCapsuleSize(30.f, 60.f);
 
 	//Set mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlayerAsset(TEXT("StaticMesh'/Game/Meshes/CharMesh.CharMesh'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> PlayerAsset(TEXT("SkeletalMesh'/Game/Meshes/erba.erba'"));
 	if (PlayerAsset.Succeeded())
 	{
-		PlayerMesh->SetStaticMesh(PlayerAsset.Object);
-		PlayerMesh->SetRelativeLocation(FVector(0.f, 0.f, -50.f));
+		PlayerMesh->SetSkeletalMesh(PlayerAsset.Object);
+		PlayerMesh->SetRelativeLocation(FVector(5.f, 0.f, -60.f));
+		PlayerMesh->SetWorldScale3D(FVector(1.1f, 1.1f, 1.1f));
 	}
 
 	CollisionComponent->SetRelativeLocation(FVector(0.f, 0.f, 5.f));
@@ -63,7 +64,7 @@ AMyCharacter::AMyCharacter()
 	HeldObject = nullptr;
 
 	Oil = 0;
-	Health = 50;
+	Health = 100;
 	Herbs = 0;
 	Max = 100;
 	Interaction = 0;
@@ -87,12 +88,16 @@ void AMyCharacter::Tick(float DeltaTime)
 
 	Raycast();
 
+	//Update oil bar if character has lantern
+	if (bHaveLantern)
+	{
+		Oil = float(TheLantern->OilStatus());
+	}
+
+	Health = float(Cast<AMyPlayerController>(GetController())->GetHealth());
 
 	//handles rotation of character
-
-	//if (upRot == 1 || downRot == 1 || leftRot == 1 || rightRot == 1) {
 	AverageRot = CurrentRot / (upRot + downRot + leftRot + rightRot);
-
 
 	if (upRot == 1 && rightRot == 1 && downRot == 0 && leftRot == 0) {
 		AverageRot = 0;
@@ -104,17 +109,12 @@ void AMyCharacter::Tick(float DeltaTime)
 	FRotator RotationSet = FRotator(0, AverageRot, 0);
 	PlayerMesh->SetWorldRotation(RotationSet);
 
-	//}
-
-
-
 	//check to see if player is in tallgrass
 	//Get all actors within player's collision component
-	//----Consider using sphere trace instead
 	TArray<AActor*> Overlapping;
 	GetOverlappingActors(Overlapping);
 
-	//Check if there's an object to interact with, and pick it up if player isn't holding anything from before
+	//Check if there's an object to interact with
 	bZoom = false;
 	Interaction = 0;
 	EntrancePopUp = 0;
@@ -126,12 +126,12 @@ void AMyCharacter::Tick(float DeltaTime)
 			break;
 		}
 
-		if ((Obj->ActorHasTag("Entrance") && HasLantern==0) || (Obj->ActorHasTag("Entrance") && Herbs < 4))
+		if ((Obj->ActorHasTag("Entrance")) || (Obj->ActorHasTag("Entrance") && Herbs < 4))
 		{
 			EntrancePopUp = 1;
 			break;
 		}
-		if (Obj->ActorHasTag("Entrance") && HasLantern == 1 && Herbs == 4)
+		if (Obj->ActorHasTag("Entrance") && Herbs == 4)
 		{
 			Obj->SetActorEnableCollision(false);
 			break;
@@ -140,15 +140,12 @@ void AMyCharacter::Tick(float DeltaTime)
 		{
 			UGameplayStatics::OpenLevel(GetWorld(), "LevelTwo");
 			break;
-		}
-		
-
-		if (Obj->ActorHasTag("PickUp") || Obj->ActorHasTag("HerbConsumable") || Obj->ActorHasTag("LanternConsumable") || Obj->ActorHasTag("Projectile")) {
+		}		
+		if (Obj->ActorHasTag("PickUp") || Obj->ActorHasTag("Consumable") || Obj->ActorHasTag("Lantern") || Obj->ActorHasTag("Projectile")) {
 			Interaction = 1;
 			break;
 		}
 	}
-
 
 	if (bZoom == false) {
 		PlayerCamera->SetRelativeLocation(FVector(-450.f, 440.f, 525.f));
@@ -156,8 +153,8 @@ void AMyCharacter::Tick(float DeltaTime)
 	if (bZoom == true) {
 		PlayerCamera->SetRelativeLocation(FVector(-225.f, 220.f, 212.f));
 	}
-
 }
+
 
 // Called to bind functionality to input
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -223,7 +220,6 @@ void AMyCharacter::Interacting()
 			}
 			else if (Obj->ActorHasTag("Consumable"))
 			{
-				Herbs++;
 				Cast<AConsumable>(Obj)->ConsumeObject(this);
 			}
 			else if (Obj->ActorHasTag("Lantern") && !bHaveLantern)
@@ -427,6 +423,8 @@ void AMyCharacter::StartRotationUp()
 	upRot = 1;
 	CurrentRot -= 45;
 }
+
+
 void AMyCharacter::StopRotationUp()
 {
 	upRot = 0;
@@ -439,6 +437,8 @@ void AMyCharacter::StartRotationDown()
 	downRot = 1;
 	CurrentRot -= 225;
 }
+
+
 void AMyCharacter::StopRotationDown()
 {
 	downRot = 0;
@@ -451,6 +451,8 @@ void AMyCharacter::StartRotationLeft()
 	leftRot = 1;
 	CurrentRot -= 135;
 }
+
+
 void AMyCharacter::StopRotationLeft()
 {
 	leftRot = 0;
@@ -463,6 +465,8 @@ void AMyCharacter::StartRotationRight()
 	rightRot = 1;
 	CurrentRot -= 315;
 }
+
+
 void AMyCharacter::StopRotationRight()
 {
 	rightRot = 0;
@@ -470,11 +474,11 @@ void AMyCharacter::StopRotationRight()
 }
 
 
-
 AActor * AMyCharacter::GetLantern()
 {
 	return TheLantern;
 }
+
 
 bool AMyCharacter::GetLanternStatus()
 {
@@ -482,14 +486,10 @@ bool AMyCharacter::GetLanternStatus()
 }
 
 
-
-
-
-
-
-
-
-
+void AMyCharacter::IncreaseHerb()
+{
+	Herbs++;
+}
 
 
 //Casts a ray and sees if it hits a tree
@@ -511,12 +511,11 @@ void AMyCharacter::Raycast()
 }
 
 
-
-//-----Consider using OnHit on capsule component (see AI Muyshroom)
+//-----Consider using OnHit on capsule component (see AI Mushroom)
 void AMyCharacter::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (OtherActor->ActorHasTag("Enemy"))
 	{
-		//Cast<AMyPlayerController>(GetController())->TakeDamage(10);
+		Cast<AMyPlayerController>(GetController())->LoseHealth(10);
 	}
 }

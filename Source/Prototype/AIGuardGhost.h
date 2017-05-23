@@ -45,4 +45,6 @@ private:
 	float InvestigationTime;
 	float TimeStunned;
 	float StunStart;
+	float CurrentZ;
+	float RunningTime;
 };

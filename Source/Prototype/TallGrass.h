@@ -22,12 +22,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	UShapeComponent* RootSphere = nullptr;
 
 	UPROPERTY(EditAnywhere)
-		UShapeComponent* RootSphere = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* VisibleComponent;
+	UStaticMeshComponent* VisibleComponent;
 	
 
 };

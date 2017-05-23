@@ -27,19 +27,10 @@ ACrystal::ACrystal()
 	}
 
 	//Set mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> HerbAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> HerbAsset(TEXT("StaticMesh'/Game/Meshes/lotus_2.lotus_2'"));
 	if (HerbAsset.Succeeded())
 	{
 		HerbMesh->SetStaticMesh(HerbAsset.Object);
-		HerbMesh->SetWorldScale3D(FVector(0.2f, 0.2f, 0.4f));
-		HerbMesh->SetRelativeLocation(FVector(0.f, 0.f, 20.f));
-	}
-
-	//Apply material
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatHerb(TEXT("Material'/Game/Material/M_Herbs.M_Herbs'"));
-	if (MatHerb.Succeeded())
-	{
-		HerbMesh->SetMaterial(0, MatHerb.Object);
 	}
 
 	Glow->SetCastShadows(false);
@@ -69,11 +60,12 @@ void ACrystal::Tick(float DeltaTime)
 
 void ACrystal::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
+	//Takes damage from projectiles
 	if(OtherActor->ActorHasTag("Projectile"))
 	{
 		HitPoints -= 20;
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 
+		//If no more health, spawn a herb that can be picked up at it's location before object is destroyed
 		if (HitPoints <= 0)
 		{
 			FVector HerbPos = GetActorLocation();

@@ -10,7 +10,6 @@ AEntrance::AEntrance()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
 
@@ -29,6 +28,5 @@ void AEntrance::BeginPlay()
 void AEntrance::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

@@ -28,6 +28,5 @@ void ALevel2Entrance::BeginPlay()
 void ALevel2Entrance::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

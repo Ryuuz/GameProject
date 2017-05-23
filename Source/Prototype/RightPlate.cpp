@@ -19,12 +19,14 @@ ARightPlate::ARightPlate()
 	}
 }
 
+
 // Called when the game starts or when spawned
 void ARightPlate::BeginPlay()
 {
 	Super::BeginPlay();
 	Tags.Add(FName("RightPlate"));
 }
+
 
 // Called every frame
 void ARightPlate::Tick(float DeltaTime)

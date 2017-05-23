@@ -25,6 +25,7 @@ ALeftDoor::ALeftDoor()
 	Open = false;
 }
 
+
 // Called when the game starts or when spawned
 void ALeftDoor::BeginPlay()
 {
@@ -34,15 +35,19 @@ void ALeftDoor::BeginPlay()
 	OpenRotation.Yaw -= 90.f;
 }
 
+
 // Called every frame
 void ALeftDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//If the door is unlocked but not open yet
 	if (!Open && Unlocked && Right)
 	{
+		//If the rigt door is unlocked as well
 		if (Right->IsUnlocked())
 		{
+			//Open door
 			SetActorRotation(FMath::Lerp(GetActorRotation(), OpenRotation, 0.01f));
 
 			if (GetActorRotation() == OpenRotation)
@@ -53,6 +58,8 @@ void ALeftDoor::Tick(float DeltaTime)
 	}
 }
 
+
+//Door is unlocked when the plate is attached
 void ALeftDoor::AttachPlate(AActor * Plate)
 {
 	Plate->SetActorEnableCollision(false);

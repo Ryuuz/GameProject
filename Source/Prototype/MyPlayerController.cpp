@@ -26,7 +26,6 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Hit", IE_Pressed, this, &AMyPlayerController::SwingStick);
 	InputComponent->BindAction("Lantern", IE_Pressed, this, &AMyPlayerController::ToggleLantern);
 
-
 	InputComponent->BindAction("RotationUp", IE_Pressed, this, &AMyPlayerController::StartRotationUp);
 	InputComponent->BindAction("RotationUp", IE_Released, this, &AMyPlayerController::StopRotationUp);
 
@@ -128,6 +127,7 @@ void AMyPlayerController::SwingStick()
 	}
 }
 
+
 void AMyPlayerController::ToggleLantern()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -139,7 +139,6 @@ void AMyPlayerController::ToggleLantern()
 }
 
 
-
 void AMyPlayerController::StartRotationUp()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -149,6 +148,8 @@ void AMyPlayerController::StartRotationUp()
 		Player->StartRotationUp();
 	}
 }
+
+
 void AMyPlayerController::StopRotationUp()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -169,6 +170,8 @@ void AMyPlayerController::StartRotationDown()
 		Player->StartRotationDown();
 	}
 }
+
+
 void AMyPlayerController::StopRotationDown()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -189,6 +192,8 @@ void AMyPlayerController::StartRotationRight()
 		Player->StartRotationRight();
 	}
 }
+
+
 void AMyPlayerController::StopRotationRight()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -209,6 +214,8 @@ void AMyPlayerController::StartRotationLeft()
 		Player->StartRotationLeft();
 	}
 }
+
+
 void AMyPlayerController::StopRotationLeft()
 {
 	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
@@ -220,14 +227,7 @@ void AMyPlayerController::StopRotationLeft()
 }
 
 
-
-
-
-
-
-
-/*
-void AMyPlayerController::TakeDamage(int32 Damage)
+void AMyPlayerController::LoseHealth(int32 Damage)
 {
 	Health -= Damage;
 
@@ -236,4 +236,10 @@ void AMyPlayerController::TakeDamage(int32 Damage)
 		Health = 0;
 	}
 }
-*/
+
+
+void AMyPlayerController::RegainHealth(int32 Healing)
+{
+	Health += Healing;
+	Health -= Healing % 100;
+}

@@ -18,18 +18,18 @@ ATallGrass::ATallGrass()
 
 }
 
+
 // Called when the game starts or when spawned
 void ATallGrass::BeginPlay()
 {
 	Super::BeginPlay();
-	
 
 	Tags.Add(FName("TallGrass"));
 }
+
 
 // Called every frame
 void ATallGrass::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }

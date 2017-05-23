@@ -15,18 +15,10 @@ ATree::ATree()
 	TreeMesh->SetupAttachment(RootComponent);
 
 	//Sets mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> TreeAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> TreeAsset(TEXT("StaticMesh'/Game/Meshes/hostfarger.hostfarger'"));
 	if (TreeAsset.Succeeded())
 	{
 		TreeMesh->SetStaticMesh(TreeAsset.Object);
-		TreeMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 4.f));
-	}
-
-	//Applies Material
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatTrunk(TEXT("Material'/Game/Material/M_Trunk.M_Trunk'"));
-	if (MatTrunk.Succeeded())
-	{
-		TreeMesh->SetMaterial(0, MatTrunk.Object);
 	}
 }
 

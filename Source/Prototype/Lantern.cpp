@@ -31,6 +31,7 @@ ALantern::ALantern()
 		LanternMesh->SetMaterial(0, MatGlass.Object);
 	}
 
+	//Settings for the light
 	LanternLight->SetRelativeLocation(FVector(0.f, 0.f, 10.f));
 	LanternLight->SetCastShadows(false);
 	LanternLight->SetIntensity(1000.f);
@@ -42,6 +43,7 @@ ALantern::ALantern()
 	bLanternOn = false;
 }
 
+
 // Called when the game starts or when spawned
 void ALantern::BeginPlay()
 {
@@ -49,11 +51,13 @@ void ALantern::BeginPlay()
 	Tags.Add(FName("Lantern"));
 }
 
+
 // Called every frame
 void ALantern::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Oil is used up over time when the lantern is on
 	if (bLanternOn && (GetWorld()->GetTimeSeconds() - CurrentTime) >= DepleteTime)
 	{
 		OilLevel--;
@@ -67,8 +71,10 @@ void ALantern::Tick(float DeltaTime)
 	}
 }
 
+
 void ALantern::ToggleLantern()
 {
+	//Can only use lantern if there is oil left
 	if (OilLevel > 0)
 	{
 		bLanternOn = !bLanternOn;
@@ -77,16 +83,14 @@ void ALantern::ToggleLantern()
 		if (bLanternOn)
 		{
 			CurrentTime = GetWorld()->GetTimeSeconds();
-			UE_LOG(LogTemp, Warning, TEXT("Lantern on. Oil level is %d"), OilLevel);
 		}
 	}
 }
+
 
 void ALantern::RestoreOil(int32 Amount)
 {
 	OilLevel += Amount;
 	OilLevel -= OilLevel % 100;
-
-	UE_LOG(LogTemp, Warning, TEXT("Oil refilled to %d"), OilLevel);
 }
 

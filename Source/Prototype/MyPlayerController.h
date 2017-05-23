@@ -26,23 +26,19 @@ public:
 	void ThrowObject();
 	void SwingStick();
 	void ToggleLantern();
-//	void TakeDamage(int32 Damage);
-//	void RegainHealth(int32 Healing);
+	void LoseHealth(int32 Damage);
+	void RegainHealth(int32 Healing);
 
+	FORCEINLINE int32 GetHealth() { return Health; }
 
 	void StartRotationUp();
 	void StopRotationUp();
-
 	void StartRotationDown();
 	void StopRotationDown();
-
 	void StartRotationRight();
 	void StopRotationRight();
-
 	void StartRotationLeft();
 	void StopRotationLeft();
-
-
 
 private:
 	int32 Health;

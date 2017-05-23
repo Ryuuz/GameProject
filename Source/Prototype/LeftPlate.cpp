@@ -19,12 +19,14 @@ ALeftPlate::ALeftPlate()
 	}
 }
 
+
 // Called when the game starts or when spawned
 void ALeftPlate::BeginPlay()
 {
 	Super::BeginPlay();
 	Tags.Add(FName("LeftPlate"));
 }
+
 
 // Called every frame
 void ALeftPlate::Tick(float DeltaTime)

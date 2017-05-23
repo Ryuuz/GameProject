@@ -37,6 +37,7 @@ AAIPatrolGhost::AAIPatrolGhost()
 	bChasingPlayer = false;
 	bReturning = false;
 	bStunned = false;
+	CurrentZ = 0;
 }
 
 

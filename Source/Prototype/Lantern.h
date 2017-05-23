@@ -11,20 +11,18 @@ class PROTOTYPE_API ALantern : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ALantern();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void ToggleLantern();
 	void RestoreOil(int32 Amount);
 
 	FORCEINLINE bool LanternStatus() { return bLanternOn; }
+	FORCEINLINE int32 OilStatus() { return OilLevel; }
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* LanternMesh;

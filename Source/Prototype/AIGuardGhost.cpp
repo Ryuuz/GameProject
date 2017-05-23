@@ -16,7 +16,6 @@ AAIGuardGhost::AAIGuardGhost()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GuardMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AIMesh"));
-
 	GuardMesh->SetupAttachment(RootComponent);
 
 	//Set mesh
@@ -34,6 +33,7 @@ AAIGuardGhost::AAIGuardGhost()
 	bReturning = false;
 	bInvestigating = false;
 	bStunned = false;
+	CurrentZ = 0;
 }
 
 
@@ -52,6 +52,11 @@ void AAIGuardGhost::BeginPlay()
 void AAIGuardGhost::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
+	CurrentZ += DeltaHeight * 20.0f;
+	RunningTime += DeltaTime;
+	GuardMesh->SetRelativeLocation(FVector(0.f, 0.f, CurrentZ));
 
 	//Remove stun after set time
 	if (bStunned && (GetWorld()->GetTimeSeconds() - StunStart) >= TimeStunned)

@@ -19,13 +19,11 @@ ABoulder::ABoulder()
 void ABoulder::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ABoulder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
