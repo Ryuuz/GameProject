@@ -20,8 +20,29 @@ public:
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 	void JumpUp();
-	void TakeDamage(int32 Damage);
-	void RegainHealth(int32 Healing);
+	void StopJump();
+	void Interacting();
+	void StopInteracting();
+	void ThrowObject();
+	void SwingStick();
+	void ToggleLantern();
+//	void TakeDamage(int32 Damage);
+//	void RegainHealth(int32 Healing);
+
+
+	void StartRotationUp();
+	void StopRotationUp();
+
+	void StartRotationDown();
+	void StopRotationDown();
+
+	void StartRotationRight();
+	void StopRotationRight();
+
+	void StartRotationLeft();
+	void StopRotationLeft();
+
+
 
 private:
 	int32 Health;
