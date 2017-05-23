@@ -9,6 +9,12 @@
 #include "AIMushroom.h"
 #include "CrystalPiece.h"
 #include "CrystalProjectile.h"
+#include "Lantern.h"
+#include "Consumable.h"
+#include "RightPlate.h"
+#include "LeftPlate.h"
+#include "RightDoor.h"
+#include "LeftDoor.h"
 #include "MyCharacter.h"
 
 
@@ -51,6 +57,7 @@ AMyCharacter::AMyCharacter()
 
 	bAttemptInteract = false;
 	bHoldingItem = false;
+	bHaveLantern = false;
 	HeldObject = nullptr;
 }
 
@@ -138,7 +145,7 @@ void AMyCharacter::Interacting()
 	//Get all actors within player's collision component
 	//----Consider using sphere trace instead
 	TArray<AActor*> Overlapping;
-	GetOverlappingActors(Overlapping);
+	CollisionComponent->GetOverlappingActors(Overlapping);
 
 	//Check if there's an object to interact with, and pick it up if player isn't holding anything from before
 	for (auto Obj : Overlapping)
@@ -155,8 +162,15 @@ void AMyCharacter::Interacting()
 			}
 			else if (Obj->ActorHasTag("Consumable"))
 			{
-				//Switch out with a Consume function in the Consumable class once made
-				Obj->Destroy();
+				Cast<AConsumable>(Obj)->ConsumeObject(this);
+			}
+			else if (Obj->ActorHasTag("Lantern") && !bHaveLantern)
+			{
+				Obj->SetActorEnableCollision(false);
+				Obj->AttachToComponent(PlayerMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("LeftHand")));
+				bAttemptInteract = true;
+				bHaveLantern = true;
+				TheLantern = Cast<ALantern>(Obj);
 			}
 			else if (Obj->ActorHasTag("Projectile") && !bHoldingItem)
 			{
@@ -193,6 +207,28 @@ void AMyCharacter::Interacting()
 						bAttemptInteract = true;
 						bHoldingItem = true;
 						HeldObject = Cast<APickUp>(Rock);
+					}
+				}
+			}
+			else if (bHoldingItem && (HeldObject->IsA(ALeftPlate::StaticClass()) || HeldObject->IsA(ARightPlate::StaticClass())))
+			{
+				for (auto Gate : Overlapping)
+				{
+					if (Gate->IsA(ALeftDoor::StaticClass()) && HeldObject->IsA(ALeftPlate::StaticClass()))
+					{
+						HeldObject->DetachRootComponentFromParent();
+						Cast<ALeftDoor>(Gate)->AttachPlate(HeldObject);
+
+						HeldObject = nullptr;
+						bHoldingItem = false;
+					}
+					else if (Gate->IsA(ARightDoor::StaticClass()) && HeldObject->IsA(ARightPlate::StaticClass()))
+					{
+						HeldObject->DetachRootComponentFromParent();
+						Cast<ARightDoor>(Gate)->AttachPlate(HeldObject);
+
+						HeldObject = nullptr;
+						bHoldingItem = false;
 					}
 				}
 			}
@@ -315,6 +351,15 @@ void AMyCharacter::SwingStick()
 }
 
 
+void AMyCharacter::UseLantern()
+{
+	if (bHaveLantern)
+	{
+		TheLantern->ToggleLantern();
+	}
+}
+
+
 
 
 //SETS ROTATION VALUES ON KEY DOWN AND REMOVES THEM ON KEY UP
@@ -351,6 +396,16 @@ void AMyCharacter::StopRotationLeft()
 {
 	leftRot = 0;
 	CurrentRot += 135;
+}
+
+AActor * AMyCharacter::GetLantern()
+{
+	return TheLantern;
+}
+
+bool AMyCharacter::GetLanternStatus()
+{
+	return TheLantern->LanternStatus();
 }
 
 

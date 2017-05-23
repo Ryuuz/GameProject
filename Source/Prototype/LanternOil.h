@@ -13,7 +13,12 @@ class PROTOTYPE_API ALanternOil : public AConsumable
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+	ALanternOil();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void Tick(float DeltaTime) override;
+	virtual void ConsumeObject(APawn* Player) override;	
 };

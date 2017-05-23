@@ -5,6 +5,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/PawnSensingComponent.h"
 #include "AIShroomController.h"
+#include "MyCharacter.h"
 #include "AIPatrolGhost.h"
 
 
@@ -169,7 +170,15 @@ void AAIPatrolGhost::OnPlayerSeen(APawn * pawn)
 		if (pawn->ActorHasTag("Player") && AIController)
 		{
 			bChasingPlayer = true;
-			AIController->SetPlayerAsSeen(pawn, 2.f);
+
+			if (Cast<AMyCharacter>(pawn)->GetLanternStatus())
+			{
+				AIController->SetPlayerAsSeen(pawn, 250.f);
+			}
+			else
+			{
+				AIController->SetPlayerAsSeen(pawn, 10.f);
+			}
 		}
 	}
 }

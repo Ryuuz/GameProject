@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
-#include "Consumable.generated.h"
+#include "PickUp.h"
+#include "RightPlate.generated.h"
 
 UCLASS()
-class PROTOTYPE_API AConsumable : public AActor
+class PROTOTYPE_API ARightPlate : public APickUp
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AConsumable();
+	ARightPlate();
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,8 +21,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void ConsumeObject(APawn* Player);
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* VisibleComponent;
 };

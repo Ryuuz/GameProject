@@ -6,6 +6,9 @@
 
 AHerbConsumable::AHerbConsumable()
 {
+	Glow = CreateDefaultSubobject<UPointLightComponent>(TEXT("Glow"));
+	Glow->SetupAttachment(RootComponent);
+
 	//Set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> HerbAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
 	if (HerbAsset.Succeeded())
@@ -20,6 +23,11 @@ AHerbConsumable::AHerbConsumable()
 	{
 		VisibleComponent->SetMaterial(0, MatHerb.Object);
 	}
+
+	Glow->SetCastShadows(false);
+	Glow->SetIntensity(800.f);
+	Glow->SetAttenuationRadius(100.f);
+	Glow->SetLightColor(FLinearColor(0.97, 0.57, 0.229));
 }
 
 
@@ -32,5 +40,11 @@ void AHerbConsumable::BeginPlay()
 void AHerbConsumable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AHerbConsumable::ConsumeObject(APawn * Player)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Herb consumed"));
+	Destroy();
 }
 

@@ -31,6 +31,7 @@ public:
 	void StopInteracting();
 	void ThrowItem();
 	void SwingStick();
+	void UseLantern();
 	
 	void Raycast();
 
@@ -45,6 +46,10 @@ public:
 
 	void StartRotationLeft();
 	void StopRotationLeft();
+
+	AActor* GetLantern();
+	bool GetLanternStatus();
+	FORCEINLINE bool HoldingLantern() { return bHaveLantern; }
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -65,9 +70,11 @@ private:
 	FVector CurrentVelocity;
 	
 	class APickUp* HeldObject;
+	class ALantern* TheLantern;
 	
 	bool bAttemptInteract;
 	bool bHoldingItem;
+	bool bHaveLantern;
 	
 	float AverageRot;
 	float CurrentRot;

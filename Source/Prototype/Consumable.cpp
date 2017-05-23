@@ -32,3 +32,7 @@ void AConsumable::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AConsumable::ConsumeObject(APawn* Player)
+{
+}
+

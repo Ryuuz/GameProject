@@ -24,6 +24,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interact", IE_Released, this, &AMyPlayerController::StopInteracting);
 	InputComponent->BindAction("Throw", IE_Pressed, this, &AMyPlayerController::ThrowObject);
 	InputComponent->BindAction("Hit", IE_Pressed, this, &AMyPlayerController::SwingStick);
+	InputComponent->BindAction("Lantern", IE_Pressed, this, &AMyPlayerController::ToggleLantern);
 
 
 	InputComponent->BindAction("RotationUp", IE_Pressed, this, &AMyPlayerController::StartRotationUp);
@@ -124,6 +125,16 @@ void AMyPlayerController::SwingStick()
 	if (Player)
 	{
 		Player->SwingStick();
+	}
+}
+
+void AMyPlayerController::ToggleLantern()
+{
+	AMyCharacter* Player = Cast<AMyCharacter>(GetCharacter());
+
+	if (Player)
+	{
+		Player->UseLantern();
 	}
 }
 

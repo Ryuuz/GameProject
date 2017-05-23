@@ -54,9 +54,39 @@ void ALantern::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bLanternOn && (GetWorld()->GetTimeSeconds() - CurrentTime) >= DepleteTime)
+	{
+		OilLevel--;
+		CurrentTime = GetWorld()->GetTimeSeconds();
+	}
+
+	if (OilLevel <= 0 && bLanternOn)
+	{
+		bLanternOn = false;
+		LanternLight->SetVisibility(false);
+	}
 }
 
 void ALantern::ToggleLantern()
 {
+	if (OilLevel > 0)
+	{
+		bLanternOn = !bLanternOn;
+		LanternLight->SetVisibility(bLanternOn);
+
+		if (bLanternOn)
+		{
+			CurrentTime = GetWorld()->GetTimeSeconds();
+			UE_LOG(LogTemp, Warning, TEXT("Lantern on. Oil level is %d"), OilLevel);
+		}
+	}
+}
+
+void ALantern::RestoreOil(int32 Amount)
+{
+	OilLevel += Amount;
+	OilLevel -= OilLevel % 100;
+
+	UE_LOG(LogTemp, Warning, TEXT("Oil refilled to %d"), OilLevel);
 }
 

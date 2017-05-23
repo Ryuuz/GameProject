@@ -3,16 +3,16 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "Lantern.generated.h"
+#include "LeftDoor.generated.h"
 
 UCLASS()
-class PROTOTYPE_API ALantern : public AActor
+class PROTOTYPE_API ALeftDoor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ALantern();
+	ALeftDoor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,20 +21,17 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void ToggleLantern();
-	void RestoreOil(int32 Amount);
+	void AttachPlate(AActor* Plate);
+	FORCEINLINE bool IsUnlocked() { return Unlocked; }
 
-	FORCEINLINE bool LanternStatus() { return bLanternOn; }
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* LanternMesh;
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* DoorMesh;
 
 	UPROPERTY(EditAnywhere)
-	UPointLightComponent* LanternLight;
+	class ARightDoor* Right;
 
 private:
-	int32 OilLevel;
-	bool bLanternOn;
-	float DepleteTime = 2.f;
-	float CurrentTime;
+	bool Unlocked;
+	bool Open;
+	FRotator OpenRotation;
 };

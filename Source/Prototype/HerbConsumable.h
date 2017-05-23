@@ -20,4 +20,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void ConsumeObject(APawn* Player) override;
+
+	UPROPERTY(EditAnywhere)
+	UPointLightComponent* Glow;
 };
