@@ -37,6 +37,8 @@ void AMyPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("RotationLeft", IE_Pressed, this, &AMyPlayerController::StartRotationLeft);
 	InputComponent->BindAction("RotationLeft", IE_Released, this, &AMyPlayerController::StopRotationLeft);
+
+	InputComponent->BindAction("Exit", IE_Pressed, this, &AMyPlayerController::QuitGame);
 }
 
 
@@ -227,6 +229,12 @@ void AMyPlayerController::StopRotationLeft()
 }
 
 
+void AMyPlayerController::QuitGame()
+{
+	FGenericPlatformMisc::RequestExit(false);
+}
+
+
 void AMyPlayerController::LoseHealth(int32 Damage)
 {
 	Health -= Damage;
@@ -241,5 +249,5 @@ void AMyPlayerController::LoseHealth(int32 Damage)
 void AMyPlayerController::RegainHealth(int32 Healing)
 {
 	Health += Healing;
-	Health -= Healing % 100;
+	Health -= Health % 100;
 }

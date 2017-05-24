@@ -40,6 +40,8 @@ public:
 	void StartRotationLeft();
 	void StopRotationLeft();
 
+	void QuitGame();
+
 private:
 	int32 Health;
 };

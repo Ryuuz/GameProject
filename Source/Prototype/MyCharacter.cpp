@@ -78,6 +78,11 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	Tags.Add(FName("Player"));
+
+	if (GetWorld()->GetMapName() == "LevelTwo")
+	{
+		Herbs = 4;
+	}
 }
 
 
@@ -126,12 +131,12 @@ void AMyCharacter::Tick(float DeltaTime)
 			break;
 		}
 
-		if ((Obj->ActorHasTag("Entrance")) || (Obj->ActorHasTag("Entrance") && Herbs < 4))
+		if ((Obj->ActorHasTag("Entrance")) && (Obj->ActorHasTag("Entrance") && Herbs < 4))
 		{
 			EntrancePopUp = 1;
 			break;
 		}
-		if (Obj->ActorHasTag("Entrance") && Herbs == 4)
+		if (Obj->ActorHasTag("Entrance") && Herbs == 4.f)
 		{
 			Obj->SetActorEnableCollision(false);
 			break;
@@ -152,6 +157,15 @@ void AMyCharacter::Tick(float DeltaTime)
 	}
 	if (bZoom == true) {
 		PlayerCamera->SetRelativeLocation(FVector(-225.f, 220.f, 212.f));
+	}
+
+	if (Herbs == 8)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Won");
+	}
+	if (Health <= 0)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Lost");
 	}
 }
 
