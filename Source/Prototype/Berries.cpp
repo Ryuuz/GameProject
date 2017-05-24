@@ -9,7 +9,7 @@
 ABerries::ABerries()
 {
 	//Set mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> BerryAsset(TEXT("StaticMesh'/Game/Meshes/lotus_2.lotus_2'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BerryAsset(TEXT("StaticMesh'/Game/Meshes/Mesh_Berry.Mesh_Berry'"));
 	if (BerryAsset.Succeeded())
 	{
 		VisibleComponent->SetStaticMesh(BerryAsset.Object);

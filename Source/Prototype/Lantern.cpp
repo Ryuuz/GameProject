@@ -17,22 +17,15 @@ ALantern::ALantern()
 	LanternLight->SetupAttachment(RootComponent);
 
 	//Set Mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LanternAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> LanternAsset(TEXT("StaticMesh'/Game/Meshes/Mesh_Lantern.Mesh_Lantern'"));
 	if (LanternAsset.Succeeded())
 	{
 		LanternMesh->SetStaticMesh(LanternAsset.Object);
-		LanternMesh->SetWorldScale3D(FVector(0.15f, 0.15f, 0.3f));
 		LanternMesh->SetSimulatePhysics(false);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatGlass(TEXT("Material'/Game/Material/M_Glass.M_Glass'"));
-	if (MatGlass.Succeeded())
-	{
-		LanternMesh->SetMaterial(0, MatGlass.Object);
-	}
-
 	//Settings for the light
-	LanternLight->SetRelativeLocation(FVector(0.f, 0.f, 10.f));
+	LanternLight->SetRelativeLocation(FVector(0.f, 0.f, -30.f));
 	LanternLight->SetCastShadows(false);
 	LanternLight->SetIntensity(1000.f);
 	LanternLight->SetLightColor(FLinearColor(0.97, 0.57, 0.229));

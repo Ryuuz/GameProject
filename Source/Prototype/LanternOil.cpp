@@ -9,11 +9,10 @@
 ALanternOil::ALanternOil()
 {
 	//Set mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> OilAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> OilAsset(TEXT("StaticMesh'/Game/Meshes/Mesh_LanternOil.Mesh_LanternOil'"));
 	if (OilAsset.Succeeded())
 	{
 		VisibleComponent->SetStaticMesh(OilAsset.Object);
-		VisibleComponent->SetWorldScale3D(FVector(0.2f, 0.2f, 0.4f));
 	}
 }
 
