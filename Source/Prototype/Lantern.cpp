@@ -84,6 +84,9 @@ void ALantern::ToggleLantern()
 void ALantern::RestoreOil(int32 Amount)
 {
 	OilLevel += Amount;
-	OilLevel -= OilLevel % 100;
+	if (OilLevel > 100)
+	{
+		OilLevel = 100;
+	}
 }
 

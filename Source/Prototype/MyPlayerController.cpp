@@ -249,5 +249,9 @@ void AMyPlayerController::LoseHealth(int32 Damage)
 void AMyPlayerController::RegainHealth(int32 Healing)
 {
 	Health += Healing;
-	Health -= Health % 100;
+	
+	if (Health > 100)
+	{
+		Health = 100;
+	}
 }
